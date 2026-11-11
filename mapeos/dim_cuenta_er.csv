@@ -1,0 +1,44 @@
+cuenta_id,orden,cuenta,cuenta_corta,grupo,tipo_fila,es_subtotal,signo,grupo_cascada,orden_cascada,unidad
+ER01,1,Ingresos de Actividades Ordinarias,Ventas,Ingresos,detalle,false,1,Ventas,1,Miles de S/
+ER02,2,Costo de Ventas,Costo de ventas,Costo de ventas,detalle,false,-1,Costo de ventas,2,Miles de S/
+ER03,3,Ganancia (Pérdida) Bruta,Utilidad bruta,Utilidad bruta,subtotal,true,1,Utilidad bruta,3,Miles de S/
+ER04,4,Gastos de Ventas y Distribución,Gastos de ventas,Gastos operativos,detalle,false,-1,Gastos de ventas,4,Miles de S/
+ER05,5,Gastos de Administración,Gastos de administración,Gastos operativos,detalle,false,-1,Gastos de administración,5,Miles de S/
+ER06,6,Otros Ingresos Operativos,Otros ingresos operativos,Otros operativos,detalle,false,1,"Otros operativos, neto",6,Miles de S/
+ER07,7,Otros Gastos Operativos,Otros gastos operativos,Otros operativos,detalle,false,-1,"Otros operativos, neto",6,Miles de S/
+ER08,8,Otras Ganancias (Pérdidas),Otras ganancias (pérdidas),Otros operativos,detalle,false,1,"Otros operativos, neto",6,Miles de S/
+ER09,9,Ganancia (Pérdida) Operativa,Utilidad operativa,Utilidad operativa,subtotal,true,1,Utilidad operativa,7,Miles de S/
+ER10,10,Ganancia (Pérdida) de la Baja en Activos Financieros medidos al Costo Amortizado,Baja de activos financieros a costo amortizado,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER11,11,Ingresos Financieros,Ingresos financieros,Resultado financiero,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER12,12,Ingresos por Intereses calculados usando el Método de Interes Efectivo,Ingresos por intereses (tasa efectiva),Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER13,13,Gastos Financieros,Gastos financieros,Resultado financiero,detalle,false,-1,"Resultado financiero, neto",8,Miles de S/
+ER14,14,Ganancia (Pérdida) por Deterioro de Valor (Pérdidas Crediticias Esperadas o Reversiones),Deterioro de valor (pérdidas crediticias),Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER15,15,Participación en la Ganancia (Pérdida) neta de Asociadas y Negocios Conjuntos Contabilizados por el Método de la Participación,Participación en asociadas,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER16,16,Diferencias de Cambio Neto,Diferencia de cambio,Resultado financiero,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER17,17,Ganancias (Pérdidas) por Reclasificación de Activos Financieros a Valor Razonable con cambios en Resultados antes medidos al Costo Amortizado,Reclasificación de activos financieros a VR,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER18,18,Ganancia (Pérdida) Acumulada en Otro Resultado Integral por Activos Financieros medidos a Valor Razonable reclasificados como cambios en Resultados,ORI acumulado reclasificado a resultados,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER19,19,Ganancias (Pérdidas) por Cobertura de un Grupo de Partidas con posiciones de Riesgo Compensadoras,Cobertura de grupo de partidas,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER20,20,Diferencia entre el Importe en Libros de los Activos Distribuidos y el Importe en Libros del Dividendo a pagar,Diferencia activos distribuidos vs. dividendo,Otros no operativos,detalle,false,1,"Resultado financiero, neto",8,Miles de S/
+ER21,21,Ganancia (Pérdida) antes de Impuestos,Utilidad antes de impuestos,Utilidad antes de impuestos,subtotal,true,1,Utilidad antes de impuestos,9,Miles de S/
+ER22,22,Ingreso (Gasto) por Impuesto,Impuesto a la renta,Impuesto,detalle,false,-1,Impuesto,10,Miles de S/
+ER23,23,Ganancia (Pérdida) Neta de Operaciones Continuadas,Utilidad de operaciones continuadas,Utilidad continuadas,subtotal,true,1,Utilidad continuadas,11,Miles de S/
+ER24,24,"Ganancia (Pérdida) procedente de Operaciones Discontinuadas, neta de Impuesto",Resultado de operaciones discontinuadas,Discontinuadas,detalle,false,1,Discontinuadas,12,Miles de S/
+ER25,25,Ganancia (Pérdida) Neta del Ejercicio,Utilidad neta,Utilidad neta,subtotal,true,1,Utilidad neta,13,Miles de S/
+ER26,26,Ganancia (Pérdida) Neta atribuible a:,Utilidad neta atribuible a:,Atribución,titulo,false,1,,,Miles de S/
+ER27,27,Propietarios de la Controladora,Utilidad neta – controladora,Atribución,memo,false,1,,,Miles de S/
+ER28,28,Participaciones no Controladoras,Utilidad neta – no controladoras,Atribución,memo,false,1,,,Miles de S/
+ER29,29,Ganancias (Pérdida) por Acción:,Ganancia por acción,UPA,titulo,false,1,,,S/ por acción
+ER30,30,Ganancias (Pérdida) Básica por Acción:,UPA básica,UPA,titulo,false,1,,,S/ por acción
+ER31,31,Básica por Acción Ordinaria en Operaciones Continuadas,UPA básica ordinaria – continuadas,UPA,memo,false,1,,,S/ por acción
+ER32,32,Básica por Acción Ordinaria en Operaciones Discontinuadas,UPA básica ordinaria – discontinuadas,UPA,memo,false,1,,,S/ por acción
+ER33,33,Total de Ganancias (Pérdida) Básica por Acción Ordinaria,UPA básica ordinaria – total,UPA,memo,false,1,,,S/ por acción
+ER34,34,Básica por Acción de Inversión en Operaciones Continuadas,UPA básica inversión – continuadas,UPA,memo,false,1,,,S/ por acción
+ER35,35,Básica por Acción de Inversión en Operaciones Discontinuadas,UPA básica inversión – discontinuadas,UPA,memo,false,1,,,S/ por acción
+ER36,36,Total de Ganancias (Pérdida) Básica por Acción Inversión,UPA básica inversión – total,UPA,memo,false,1,,,S/ por acción
+ER37,37,Ganancias (Pérdida) Diluida por Acción:,UPA diluida,UPA,titulo,false,1,,,S/ por acción
+ER38,38,Diluida por Acción Ordinaria en Operaciones Continuadas,UPA diluida ordinaria – continuadas,UPA,memo,false,1,,,S/ por acción
+ER39,39,Diluida por Acción Ordinaria en Operaciones Discontinuadas,UPA diluida ordinaria – discontinuadas,UPA,memo,false,1,,,S/ por acción
+ER40,40,Total ganancias (Pérdida) Diluida por Acción Ordinaria,UPA diluida ordinaria – total,UPA,memo,false,1,,,S/ por acción
+ER41,41,Diluida por Acción de Inversión en Operaciones Continuadas,UPA diluida inversión – continuadas,UPA,memo,false,1,,,S/ por acción
+ER42,42,Diluida por Acción de Inversión en Operaciones Discontinuadas,UPA diluida inversión – discontinuadas,UPA,memo,false,1,,,S/ por acción
+ER43,43,Total de Ganancias (Pérdida) Diluida por Acción Inversión,UPA diluida inversión – total,UPA,memo,false,1,,,S/ por acción
