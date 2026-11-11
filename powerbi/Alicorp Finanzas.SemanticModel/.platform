@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Alicorp Finanzas"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "584bb5b2-8d8d-4e5a-9d68-61dd32c42a52"
+  }
+}

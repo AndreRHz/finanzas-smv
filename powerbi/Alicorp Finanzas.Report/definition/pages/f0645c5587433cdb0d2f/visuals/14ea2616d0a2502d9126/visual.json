@@ -1,21 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "14ea2616d0a2502d9126",
   "position": {
     "x": 1440,
     "y": 32,
-    "width": 448,
-    "height": 64,
     "z": 27000,
+    "height": 64,
+    "width": 448,
     "tabOrder": 27000
   },
   "visual": {
     "visualType": "slicer",
-    "syncGroup": {
-      "groupName": "AnioSync",
-      "fieldChanges": true,
-      "filterChanges": true
-    },
     "query": {
       "queryState": {
         "Values": {
@@ -32,7 +27,8 @@
                 }
               },
               "queryRef": "Año.Año",
-              "nativeQueryRef": "Año"
+              "nativeQueryRef": "Año",
+              "active": true
             }
           ]
         }
@@ -281,6 +277,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "groupName": "AnioSync",
+      "fieldChanges": true,
+      "filterChanges": true
     }
   }
 }

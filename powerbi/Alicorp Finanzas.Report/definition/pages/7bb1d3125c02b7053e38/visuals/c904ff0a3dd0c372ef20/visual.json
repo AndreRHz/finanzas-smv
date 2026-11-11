@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "c904ff0a3dd0c372ef20",
   "position": {
     "x": 32,
     "y": 208,
-    "width": 920,
-    "height": 840,
     "z": 17000,
+    "height": 840,
+    "width": 920,
     "tabOrder": 17000
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "Cuenta Resultados.Paso cascada",
-              "nativeQueryRef": "Paso cascada"
+              "nativeQueryRef": "Paso cascada",
+              "active": true
             }
           ]
         },
@@ -65,8 +66,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

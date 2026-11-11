@@ -1,0 +1,95 @@
+cultureInfo es-PE
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "balance.margen_neto_controladora__dupont": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Balance",
+			          "ConceptualProperty": "Margen neto controladora % (DuPont)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Margen neto (controladora)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "balance.rotación_de_activos_dupont": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Balance",
+			          "ConceptualProperty": "Rotación de activos (DuPont)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "× Rotación de activos": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "balance.apalancamiento_dupont": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Balance",
+			          "ConceptualProperty": "Apalancamiento (DuPont)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "× Apalancamiento": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "balance.roe_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Balance",
+			          "ConceptualProperty": "ROE %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "= ROE": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

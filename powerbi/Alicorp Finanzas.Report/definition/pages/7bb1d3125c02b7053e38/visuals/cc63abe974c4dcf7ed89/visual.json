@@ -1,18 +1,37 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "cc63abe974c4dcf7ed89",
   "position": {
     "x": 976,
     "y": 208,
-    "width": 920,
-    "height": 840,
     "z": 18000,
+    "height": 840,
+    "width": 920,
     "tabOrder": 18000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Año"
+                    }
+                  },
+                  "Property": "Año"
+                }
+              },
+              "queryRef": "Año.Año",
+              "nativeQueryRef": "Año",
+              "active": true
+            }
+          ]
+        },
         "Rows": {
           "projections": [
             {
@@ -27,7 +46,8 @@
                 }
               },
               "queryRef": "Cuenta Resultados.Cuenta",
-              "nativeQueryRef": "Cuenta"
+              "nativeQueryRef": "Cuenta",
+              "active": true
             }
           ]
         },
@@ -46,24 +66,6 @@
               },
               "queryRef": "Estado de Resultados.Monto",
               "nativeQueryRef": "Monto"
-            }
-          ]
-        },
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Año"
-                    }
-                  },
-                  "Property": "Año"
-                }
-              },
-              "queryRef": "Año.Año",
-              "nativeQueryRef": "Año"
             }
           ]
         }

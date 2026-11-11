@@ -8,7 +8,7 @@ model 'Alicorp Finanzas'
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBI_ProTooling = ["MCP-PBIModeling"]
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
 
 annotation PBI_QueryOrder = ["Empresa","Año","Cuenta Resultados","Cuenta Balance","Estado de Resultados","Resultados Comparativo","Balance","CarpetaParquet"]
 
@@ -19,4 +19,6 @@ ref table 'Cuenta Balance'
 ref table 'Estado de Resultados'
 ref table 'Resultados Comparativo'
 ref table Balance
+
+ref cultureInfo es-PE
 

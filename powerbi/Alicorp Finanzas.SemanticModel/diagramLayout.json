@@ -1,0 +1,113 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 916.43953489002,
+            "y": -50
+          },
+          "nodeIndex": "Resultados Comparativo",
+          "nodeLineageTag": "7ef2989a-fa45-4cfe-8c7e-afe30cecd627",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 622.58440195742344,
+            "y": 715.66421906204425
+          },
+          "nodeIndex": "Año",
+          "nodeLineageTag": "f8fa91ed-c080-4cdc-b234-af3163341596",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 424.55376331349976
+          },
+          "nodeIndex": "Balance",
+          "nodeLineageTag": "6afb61ca-516d-49aa-930d-fdb1a0201077",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 629.01942695781963,
+            "y": 92.362847125551866
+          },
+          "nodeIndex": "Cuenta Balance",
+          "nodeLineageTag": "c3d15d9b-ba00-48dd-b91e-75a0b38c258b",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1202.3379623397414,
+            "y": 302.5377267332799
+          },
+          "nodeIndex": "Cuenta Resultados",
+          "nodeLineageTag": "5ad6b0bd-385d-42f4-95c4-33166baba37a",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 339.889412091095,
+            "y": 244.35024072270289
+          },
+          "nodeIndex": "Empresa",
+          "nodeLineageTag": "d3ea1c0b-e503-4ca3-8516-9715ccf0bed6",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 912.46281804160958,
+            "y": 545.33929911429379
+          },
+          "nodeIndex": "Estado de Resultados",
+          "nodeLineageTag": "2442decf-94fc-40d8-b689-058b2dad1b1f",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}
