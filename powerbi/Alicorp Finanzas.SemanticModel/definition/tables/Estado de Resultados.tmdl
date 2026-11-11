@@ -92,6 +92,85 @@ table 'Estado de Resultados'
 		displayFolder: Márgenes
 		lineageTag: 00af3d0f-75b4-4187-b0a5-fa09c3f10ea9
 
+	/// Gastos de ventas y distribución en miles de S/ (negativo, signo contable), versión vigente.
+	measure 'Gastos de ventas' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER04" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: f9480316-375e-45c9-a0c1-02f55468671c
+
+	/// Gastos de administración en miles de S/ (negativo, signo contable), versión vigente.
+	measure 'Gastos de administración' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER05" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: e91eda6d-c993-4415-ac8b-d7a5deffa056
+
+	/// Ventas tal como se publicaron por primera vez (antes de reexpresiones por operaciones discontinuadas), miles de S/. Comparar con [Ventas] (última versión publicada).
+	measure 'Ventas originales' = CALCULATE ( [Monto original], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: a28e1613-5624-4c74-81cd-b58cec3fa9d8
+
+	/// Costo de ventas como porcentaje de las ventas (en positivo).
+	measure 'Costo de ventas % ventas' = DIVIDE ( - [Costo de ventas], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: ef2186d8-7e1f-4e5d-bed2-804f41942a39
+
+	/// Gastos de ventas y distribución como porcentaje de las ventas (en positivo).
+	measure 'Gastos de ventas % ventas' = DIVIDE ( - [Gastos de ventas], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 465b9e80-2ef1-465d-bef9-fffa4bd1c04a
+
+	/// Gastos de administración como porcentaje de las ventas (en positivo).
+	measure 'Gastos de administración % ventas' = DIVIDE ( - [Gastos de administración], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 7727d198-87cf-4f40-9d84-16096c524261
+
+	/// Frase dinámica para el subtítulo de la página Resumen: ventas del año, variación YoY comparable (n.s. si el año anterior fue negativo), utilidad neta y ROE.
+	measure 'Subtítulo resumen' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _ventas = [Ventas]
+			VAR _anterior = [Ventas año anterior]
+			VAR _textoYoY =
+			    IF (
+			        ISBLANK ( _anterior ),
+			        "sin año anterior comparable",
+			        IF ( _anterior < 0, "n.s.", FORMAT ( [Ventas YoY %], "▲ 0.0%;▼ 0.0%;0.0%" ) ) & " vs " & ( _anio - 1 )
+			    )
+			VAR _roe = [ROE %]
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Año'[Año] ),
+			        _anio & " · Ventas S/ " & FORMAT ( _ventas, "#,##0" ) & " mil (" & _textoYoY & ")"
+			            & " · Utilidad neta S/ " & FORMAT ( [Utilidad neta], "#,##0" ) & " mil"
+			            & " · ROE " & IF ( ISBLANK ( _roe ), "n.d.", FORMAT ( _roe, "0.0%" ) ),
+			        "Selecciona un año"
+			    )
+		displayFolder: Narrativa
+		lineageTag: 68e4b1dd-511a-4b72-8b63-1fb9204c92c7
+
+	/// Frase dinámica para el subtítulo de la página de cascada: de las ventas del año cuánto queda como utilidad (o pérdida) neta.
+	measure 'Subtítulo cascada' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _ventas = [Ventas]
+			VAR _neta = [Utilidad neta]
+			VAR _textoNeta =
+			    IF (
+			        _neta >= 0,
+			        "quedan S/ " & FORMAT ( _neta, "#,##0" ) & " mil de utilidad neta (" & FORMAT ( [Margen neto %], "0.0%" ) & " de las ventas)",
+			        "resulta una pérdida neta de S/ " & FORMAT ( - _neta, "#,##0" ) & " mil (" & FORMAT ( - [Margen neto %], "0.0%" ) & " de las ventas)"
+			    )
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Año'[Año] ),
+			        _anio & " · De S/ " & FORMAT ( _ventas, "#,##0" ) & " mil en ventas " & _textoNeta,
+			        "Selecciona un año"
+			    )
+		displayFolder: Narrativa
+		lineageTag: da07f0b2-26e5-47ac-8e8c-1ccb90f867aa
+
 	column 'ID empresa'
 		dataType: int64
 		isHidden

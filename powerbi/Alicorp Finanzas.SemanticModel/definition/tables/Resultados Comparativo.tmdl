@@ -24,15 +24,24 @@ table 'Resultados Comparativo'
 		displayFolder: Variación YoY
 		lineageTag: 98692580-a7cb-4ae0-836d-168c9f4336b2
 
-	/// Variación % vs. año anterior con ambos años del mismo reporte. Divide entre el valor absoluto del año anterior para que el signo sea correcto si ese año fue pérdida. Vacío para 2020.
+	/// Variación % vs. año anterior con ambos años del mismo reporte (clasificación homogénea), dividida entre el valor absoluto del año anterior. Muestra "n.s." (no significativo; valor 0) cuando el año anterior tiene signo contrario a la naturaleza de la cuenta, p. ej. una utilidad que fue pérdida. Vacío para 2020.
 	measure 'Variación YoY %' =
 			VAR _actual = [Monto año actual (comparable)]
 			VAR _anterior = [Monto año anterior (comparable)]
+			VAR _signo = SELECTEDVALUE ( 'Cuenta Resultados'[Signo], 1 )
 			RETURN
-			    DIVIDE ( _actual - _anterior, ABS ( _anterior ) )
-		formatString: 0.0%
+			    IF (
+			        NOT ISBLANK ( _anterior ),
+			        IF ( _anterior * _signo < 0, 0, DIVIDE ( _actual - _anterior, ABS ( _anterior ) ) )
+			    )
 		displayFolder: Variación YoY
 		lineageTag: a30651d4-b0f0-4c48-9b10-1d43a8e2f0e6
+
+		formatStringDefinition =
+				VAR _anterior = [Monto año anterior (comparable)]
+				VAR _signo = SELECTEDVALUE ( 'Cuenta Resultados'[Signo], 1 )
+				RETURN
+				    IF ( _anterior * _signo < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
 
 	/// Ventas del año anterior tal como las presentó el reporte del año seleccionado (comparable con las ventas del año). Miles de S/.
 	measure 'Ventas año anterior' = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
@@ -40,35 +49,55 @@ table 'Resultados Comparativo'
 		displayFolder: Variación YoY
 		lineageTag: 3c8838ea-cda1-4a6d-9bcf-4c164cb4bbbc
 
-	/// Crecimiento de ventas vs. año anterior, ambos años del mismo reporte (comparable).
+	/// Crecimiento de ventas vs. año anterior, ambos años del mismo reporte (comparable). "n.s." si el año anterior fue negativo.
 	measure 'Ventas YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
-		formatString: 0.0%
 		displayFolder: Variación YoY
 		lineageTag: 147affb1-9620-4946-9465-83eca652c622
 
-	/// Variación de la utilidad bruta vs. año anterior (comparable, mismo reporte).
+		formatStringDefinition =
+				VAR _anterior = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
+				RETURN
+				    IF ( _anterior < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
+
+	/// Variación de la utilidad bruta vs. año anterior (comparable, mismo reporte). "n.s." si el año anterior fue negativo.
 	measure 'Utilidad bruta YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER03" )
-		formatString: 0.0%
 		displayFolder: Variación YoY
 		lineageTag: 4ce46c17-4483-4347-b3ac-f6b6dd396bc6
 
-	/// Variación de la utilidad operativa vs. año anterior (comparable, mismo reporte).
+		formatStringDefinition =
+				VAR _anterior = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER03" )
+				RETURN
+				    IF ( _anterior < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
+
+	/// Variación de la utilidad operativa vs. año anterior (comparable, mismo reporte). "n.s." si el año anterior fue negativo.
 	measure 'Utilidad operativa YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER09" )
-		formatString: 0.0%
 		displayFolder: Variación YoY
 		lineageTag: b11f8f84-6d5f-40dc-a8e4-fd4c5a1be021
 
-	/// Variación de la utilidad de operaciones continuadas vs. año anterior (comparable, mismo reporte).
+		formatStringDefinition =
+				VAR _anterior = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER09" )
+				RETURN
+				    IF ( _anterior < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
+
+	/// Variación de la utilidad de operaciones continuadas vs. año anterior (comparable, mismo reporte). "n.s." si el año anterior fue negativo.
 	measure 'Utilidad continuadas YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER23" )
-		formatString: 0.0%
 		displayFolder: Variación YoY
 		lineageTag: 359f6cff-07a4-4060-bef7-b129fdab851f
 
-	/// Variación de la utilidad neta vs. año anterior (comparable). Si el año anterior fue pérdida, se divide entre su valor absoluto.
+		formatStringDefinition =
+				VAR _anterior = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER23" )
+				RETURN
+				    IF ( _anterior < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
+
+	/// Variación de la utilidad neta vs. año anterior (comparable). "n.s." si el año anterior fue pérdida (p. ej. 2022 vs. 2021).
 	measure 'Utilidad neta YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER25" )
-		formatString: 0.0%
 		displayFolder: Variación YoY
 		lineageTag: 7f9d36c8-c090-4280-9ab3-37d2009b5826
+
+		formatStringDefinition =
+				VAR _anterior = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER25" )
+				RETURN
+				    IF ( _anterior < 0, """n.s.""", "▲ 0.0%;▼ 0.0%;0.0%" )
 
 	column 'ID empresa'
 		dataType: int64

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "8b1a6ac879a0a1740f1b",
+  "displayName": "Resumen ejecutivo",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#F1F5F9'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "65913451bd0d48ef1617",
+      "target": "ae8b02c3f80bb703e7c3",
+      "type": "NoFilter"
+    },
+    {
+      "source": "65913451bd0d48ef1617",
+      "target": "22bbbfc8d5cfefb85468",
+      "type": "NoFilter"
+    }
+  ]
+}

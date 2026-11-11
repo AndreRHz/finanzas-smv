@@ -88,5 +88,15 @@ Proyecto PBIP: `powerbi/Alicorp Finanzas.pbip` → `Alicorp Finanzas.SemanticMod
 - Nota: `Utilidad neta YoY %` 2022 = +1,978.5 % (2021 fue pérdida de −28,400): correcto matemáticamente, conviene no destacarlo en el reporte.
 - Limitación para la Etapa 4: `Grupo`/`Sección` de las dimensiones de cuentas se ordenan alfabéticamente (no hay columna de orden de grupo); agregarla si una matriz los necesita en orden contable.
 
+## Reporte (Etapa 4)
+- Audiencia: **pieza de portafolio pública** (narrativa guiada, nota metodológica visible, sin logotipos/marca de Alicorp). Estilo: **corporativo sobrio** (fondo `#F1F5F9`, texto `#334155`, acento `#0E7490`, verde `#15803D`/rojo `#B91C1C` con ▲▼).
+- Especificación de diseño: `_brief/report-spec.md` (contrato YAML `Design Brief` = fuente de verdad para construir).
+
+- Ajustes aprobados al construir: **DuPont 2021-2025** en la página 4 (Margen neto controladora × Rotación de activos × Apalancamiento = ROE %, mismas definiciones que `ROE %`; identidad validada en DAX y SQL) y **"n.s."** en variaciones YoY % cuando el año anterior tiene signo contrario a la naturaleza de la cuenta (cadena de formato dinámica; valor 0; formato ▲/▼).
+- Modelo: +13 medidas (58 en total): gastos de ventas/administración y sus % de ventas, `Ventas originales`, `Activo/Pasivo no corriente`, 2 subtítulos dinámicos, 3 factores DuPont.
+- **Reporte generado por código**: `node powerbi/generar_reporte.mjs` reescribe el tema (`StaticResources/RegisteredResources/AlicorpSobrio-*.json`) y las 4 páginas (IDs estables). No editar páginas a mano en Desktop: cambiar el generador y regenerar. Validar con `powerbi-report-author validate "powerbi/Alicorp Finanzas.Report"` (3 avisos esperados de altura del segmentador; en Desktop el encabezado "Año" se ve bien).
+- **Flujo con Desktop**: al abrir un PBIP generado Desktop marca "cambios sin guardar"; para ver cambios regenerados hay que cerrar **sin guardar** y reabrir (guardar sobrescribiría el PBIR generado con la versión cargada).
+- Cambios de modelo: hacerlos vía MCP contra Desktop y exportar TMDL al PBIP (`database.tmdl` debe conservar `database 'Alicorp Finanzas'`).
+
 ## Estado actual
-Etapas 1–3 implementadas y validadas. **Esperando aprobación del usuario para iniciar la Etapa 4** (planificar el diseño antes de implementar).
+Etapa 4 construida y validada (esquema OK; capturas de las 4 páginas revisadas). **Esperando aprobación final del usuario.**

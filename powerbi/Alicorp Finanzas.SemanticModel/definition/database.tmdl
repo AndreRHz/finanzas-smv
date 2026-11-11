@@ -1,4 +1,6 @@
 /// Estados financieros consolidados anuales de Alicorp S.A.A. (SMV), 2020-2025, en miles de S/.
 database 'Alicorp Finanzas'
 	compatibilityLevel: 1702
+	compatibilityMode: powerBI
+	language: 1033
 

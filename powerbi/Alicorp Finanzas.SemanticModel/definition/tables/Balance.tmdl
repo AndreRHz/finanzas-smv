@@ -143,6 +143,61 @@ table Balance
 		displayFolder: Rentabilidad
 		lineageTag: e3890c02-3efd-4050-a961-7aa690636f8d
 
+	/// Total activos no corrientes al cierre, miles de S/.
+	measure 'Activo no corriente' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "ACT_NO_CORR" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 5d443edc-d47d-4264-ad09-26770255d64c
+
+	/// Total pasivos no corrientes al cierre, miles de S/.
+	measure 'Pasivo no corriente' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "PAS_NO_CORR" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 8bbbebe4-f847-4d44-abc3-7f0b2345dba7
+
+	/// Factor 1 DuPont (rentabilidad): Utilidad neta controladora / Ventas del año. Margen neto controladora × Rotación de activos × Apalancamiento = ROE %.
+	measure 'Margen neto controladora % (DuPont)' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			RETURN
+			    DIVIDE (
+			        CALCULATE ( [Utilidad neta controladora], 'Año'[Año] = _anio ),
+			        CALCULATE ( [Ventas], 'Año'[Año] = _anio )
+			    )
+		formatString: 0.0%
+		displayFolder: Rentabilidad\DuPont
+		lineageTag: 49176b15-bd88-457a-beaa-61866c95acc0
+
+	/// Factor 2 DuPont (eficiencia): Ventas / Activo total promedio (cierre del año anterior y del año). Vacío para 2020.
+	measure 'Rotación de activos (DuPont)' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _ventas = CALCULATE ( [Ventas], 'Año'[Año] = _anio )
+			VAR _activoFinal = CALCULATE ( [Activo total], 'Año'[Año] = _anio )
+			VAR _activoInicial = CALCULATE ( [Activo total], 'Año'[Año] = _anio - 1 )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _activoInicial ) && NOT ISBLANK ( _activoFinal ),
+			        DIVIDE ( _ventas, ( _activoInicial + _activoFinal ) / 2 )
+			    )
+		formatString: 0.00"x"
+		displayFolder: Rentabilidad\DuPont
+		lineageTag: 1ef0f3ce-e461-4f52-b5c7-97ad6b4305a7
+
+	/// Factor 3 DuPont (apalancamiento): Activo total promedio / Patrimonio controladora promedio. Distinto de [Multiplicador de capital], que usa saldos de cierre y patrimonio total. Vacío para 2020.
+	measure 'Apalancamiento (DuPont)' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _activoFinal = CALCULATE ( [Activo total], 'Año'[Año] = _anio )
+			VAR _activoInicial = CALCULATE ( [Activo total], 'Año'[Año] = _anio - 1 )
+			VAR _patrimonioFinal = CALCULATE ( [Patrimonio controladora], 'Año'[Año] = _anio )
+			VAR _patrimonioInicial = CALCULATE ( [Patrimonio controladora], 'Año'[Año] = _anio - 1 )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _activoInicial ) && NOT ISBLANK ( _patrimonioInicial ),
+			        DIVIDE ( ( _activoInicial + _activoFinal ) / 2, ( _patrimonioInicial + _patrimonioFinal ) / 2 )
+			    )
+		formatString: 0.00"x"
+		displayFolder: Rentabilidad\DuPont
+		lineageTag: d4d2ccdb-6cad-4c45-a7c5-a4b22125fbf4
+
 	column 'ID empresa'
 		dataType: int64
 		isHidden

@@ -10,6 +10,8 @@ model 'Alicorp Finanzas'
 
 annotation PBI_ProTooling = ["MCP-PBIModeling"]
 
+annotation PBI_QueryOrder = ["Empresa","Año","Cuenta Resultados","Cuenta Balance","Estado de Resultados","Resultados Comparativo","Balance","CarpetaParquet"]
+
 ref table Empresa
 ref table Año
 ref table 'Cuenta Resultados'
