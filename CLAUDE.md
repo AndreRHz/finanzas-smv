@@ -9,8 +9,8 @@ Por **etapas**. Al cerrar cada una: mostrar resultados de validación, **detener
 ## Etapas
 1. **ETL** – `etl_smv.py` carga `raw/*.xlsx` en `finanzas.duckdb` → `fact_eeff` (formato largo) + validaciones. ✅ **aprobada** (2026-11-11)
 2. **Modelo analítico (DuckDB)** – `modelo_smv.py` + `mapeos/*.csv`: dimensiones de cuentas ER y Balance, empresa, año, versión vigente y vistas `pbi_*`. ✅ **aprobada**
-3. **Modelo semántico Power BI** – `exportar_parquet.py` + PBIP en `powerbi/`: 7 tablas, 9 relaciones, 45 medidas DAX. ✅ implementada, **en revisión del usuario**
-4. **Reporte** – páginas: (1) Resumen ejecutivo KPIs, (2) Estado de Resultados en cascada, (3) Márgenes y tendencias, (4) Balance y ratios. *Planificar el diseño antes de implementarlo.*
+3. **Modelo semántico Power BI** – `exportar_parquet.py` + PBIP en `powerbi/`: 7 tablas, 9 relaciones, 45 medidas DAX (65 al cierre del proyecto). ✅ **aprobada**
+4. **Reporte** – páginas: (1) Resumen ejecutivo KPIs, (2) Estado de Resultados en cascada, (3) Márgenes y tendencias, (4) Balance y ratios. Diseño en `_brief/report-spec.md`, generado con `powerbi/generar_reporte.mjs`. ✅ **aprobada** (2026-11-11), incluidos los ajustes post-aprobación.
 
 ## Entorno
 - Python 3.14 con entorno virtual **`.venv/` dentro del proyecto** (no usar el Python global).
@@ -109,5 +109,9 @@ Proyecto PBIP: `powerbi/Alicorp Finanzas.pbip` → `Alicorp Finanzas.SemanticMod
 - Desktop quita el `$schema` de `Alicorp Finanzas.pbip` y `definition.pbir` al guardar; restaurarlo si reaparece el error `PBIR_JSON_FILE_NO_SCHEMA`.
 - Cambios de modelo: hacerlos vía MCP contra Desktop y exportar TMDL al PBIP (`database.tmdl` debe conservar `database 'Alicorp Finanzas'`).
 
+## Documentación
+- `README.md`: pieza de portafolio (tesis, capturas, arquitectura, decisiones metodológicas, validaciones, cómo reproducirlo, trabajo con Claude Code, limitaciones, nota de independencia). Revisado y aprobado por el usuario.
+- `docs/img/`: capturas de las 4 páginas (año 2025, lienzo 1920×1080 recortado de Power BI Desktop). Si cambia el reporte, volver a capturarlas: `powerbi-report-author preview "powerbi/Alicorp Finanzas.Report" --host desktop --screenshot <archivo> --page "<página>"` y recortar al lienzo.
+
 ## Estado actual
-Etapa 4 construida y validada (esquema OK; capturas de las 4 páginas revisadas). **Esperando aprobación final del usuario.**
+✅ **Proyecto cerrado (2026-11-11).** Las 4 etapas están aprobadas. El reporte valida sin errores reales (solo el falso positivo `PBIR_FORMATTING_PROP_NESTED` y los 3 avisos del segmentador) y las capturas de las 4 páginas están revisadas. README publicado. Los commits los hace el usuario.
