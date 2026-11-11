@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "e360138c2fd4bfdd1d54",
   "position": {
     "x": 976,
     "y": 120,
-    "z": 22000,
-    "height": 408,
     "width": 920,
+    "height": 408,
+    "z": 22000,
     "tabOrder": 22000
   },
   "visual": {
@@ -27,8 +27,7 @@
                 }
               },
               "queryRef": "Año.Año",
-              "nativeQueryRef": "Año",
-              "active": true
+              "nativeQueryRef": "Año"
             }
           ]
         },
@@ -80,7 +79,8 @@
             },
             "direction": "Ascending"
           }
-        ]
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -123,6 +123,13 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "innerPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }
@@ -192,6 +199,13 @@
                       "Value": "'#334155'"
                     }
                   }
+                }
+              }
+            },
+            "optimizeLabelDisplay": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

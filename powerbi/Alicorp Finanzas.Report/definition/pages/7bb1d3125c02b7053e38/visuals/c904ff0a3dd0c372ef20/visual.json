@@ -1,16 +1,16 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "c904ff0a3dd0c372ef20",
   "position": {
     "x": 32,
     "y": 208,
-    "z": 17000,
-    "height": 840,
     "width": 920,
+    "height": 840,
+    "z": 17000,
     "tabOrder": 17000
   },
   "visual": {
-    "visualType": "waterfallChart",
+    "visualType": "columnChart",
     "query": {
       "queryState": {
         "Category": {
@@ -27,8 +27,7 @@
                 }
               },
               "queryRef": "Cuenta Resultados.Paso cascada",
-              "nativeQueryRef": "Paso cascada",
-              "active": true
+              "nativeQueryRef": "Paso cascada"
             }
           ]
         },
@@ -42,11 +41,100 @@
                       "Entity": "Estado de Resultados"
                     }
                   },
+                  "Property": "Cascada base"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada base",
+              "nativeQueryRef": "Cascada base"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
+                  "Property": "Cascada total"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada total",
+              "nativeQueryRef": "Cascada total"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
+                  "Property": "Cascada aumento"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada aumento",
+              "nativeQueryRef": "Cascada aumento"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
+                  "Property": "Cascada disminución"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada disminución",
+              "nativeQueryRef": "Cascada disminución"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
+                  "Property": "Cascada aumento bajo cero"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada aumento bajo cero",
+              "nativeQueryRef": "Cascada aumento bajo cero"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
+                  "Property": "Cascada disminución bajo cero"
+                }
+              },
+              "queryRef": "Estado de Resultados.Cascada disminución bajo cero",
+              "nativeQueryRef": "Cascada disminución bajo cero"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Estado de Resultados"
+                    }
+                  },
                   "Property": "Monto"
                 }
               },
               "queryRef": "Estado de Resultados.Monto",
-              "nativeQueryRef": "Monto"
+              "nativeQueryRef": "Monto",
+              "displayName": "Monto (miles de S/)"
             }
           ]
         }
@@ -66,36 +154,40 @@
             },
             "direction": "Ascending"
           }
-        ]
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
-      "sentimentColors": [
+      "dataPoint": [
         {
           "properties": {
-            "increaseFill": {
+            "fill": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#15803D'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
               }
             },
-            "decreaseFill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#B91C1C'"
-                    }
-                  }
+            "fillTransparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
                 }
               }
-            },
-            "totalFill": {
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada base"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
               "solid": {
                 "color": {
                   "expr": {
@@ -106,6 +198,81 @@
                 }
               }
             }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada total"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#15803D'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada aumento"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#B91C1C'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada disminución"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#15803D'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada aumento bajo cero"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#B91C1C'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada disminución bajo cero"
           }
         }
       ],
@@ -122,18 +289,21 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "8D"
                 }
               }
             },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#334155'"
-                    }
-                  }
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'InsideEnd'"
+                }
+              }
+            },
+            "labelOverflow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             },
@@ -143,13 +313,141 @@
                   "Value": "1D"
                 }
               }
+            },
+            "enableBackground": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "backgroundColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "backgroundTransparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
             }
+          }
+        },
+        {
+          "properties": {
+            "showSeries": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada base"
+          }
+        },
+        {
+          "properties": {
+            "showSeries": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada aumento bajo cero"
+          }
+        },
+        {
+          "properties": {
+            "showSeries": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada disminución bajo cero"
+          }
+        },
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada total"
+          }
+        },
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada aumento"
+          }
+        },
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F172A'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Cascada disminución"
           }
         }
       ],
       "categoryAxis": [
         {
           "properties": {
+            "axisType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Categorical'"
+                }
+              }
+            },
             "fontSize": {
               "expr": {
                 "Literal": {
@@ -172,6 +470,20 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            },
+            "gridlineShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "innerPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
                 }
               }
             }
@@ -394,7 +706,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Verde suma · rojo resta · total = utilidad neta'"
+                  "Value": "'Verde suma · rojo resta · azul: ventas y subtotales, hasta la utilidad neta'"
                 }
               }
             },
@@ -425,7 +737,34 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Cascada desde ventas hasta utilidad neta del año seleccionado: costo de ventas, gastos, otros operativos, resultado financiero, impuesto y operaciones discontinuadas.'"
+                  "Value": "'Cascada desde ventas hasta utilidad neta del año seleccionado, con subtotales de utilidad bruta, operativa, antes de impuestos y de operaciones continuadas.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Default'"
+                }
+              }
+            },
+            "showTooltipFieldsOnly": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -436,60 +775,6 @@
   },
   "filterConfig": {
     "filters": [
-      {
-        "name": "Filter968cdaa8baf1998ae2de9b03",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Cuenta Resultados"
-              }
-            },
-            "Property": "Tipo de fila"
-          }
-        },
-        "type": "Categorical",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "x",
-              "Entity": "Cuenta Resultados",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "In": {
-                  "Expressions": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Source": "x"
-                          }
-                        },
-                        "Property": "Tipo de fila"
-                      }
-                    }
-                  ],
-                  "Values": [
-                    [
-                      {
-                        "Literal": {
-                          "Value": "'detalle'"
-                        }
-                      }
-                    ]
-                  ]
-                }
-              }
-            }
-          ]
-        },
-        "howCreated": "User"
-      },
       {
         "name": "Filter7063f0d07226e69d6763670b",
         "field": {

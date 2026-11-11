@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "ae8b02c3f80bb703e7c3",
   "position": {
     "x": 32,
     "y": 376,
-    "z": 10000,
-    "height": 496,
     "width": 1072,
+    "height": 584,
+    "z": 10000,
     "tabOrder": 10000
   },
   "visual": {
@@ -27,8 +27,7 @@
                 }
               },
               "queryRef": "Año.Año",
-              "nativeQueryRef": "Año",
-              "active": true
+              "nativeQueryRef": "Año"
             }
           ]
         },
@@ -84,7 +83,8 @@
             },
             "direction": "Ascending"
           }
-        ]
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -207,6 +207,20 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "labelPosition": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Above'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Estado de Resultados.Margen operativo %"
+          }
         }
       ],
       "dataPoint": [
@@ -284,35 +298,38 @@
                 }
               }
             },
-            "secShow": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "secStart": {
+            "start": {
               "expr": {
                 "Literal": {
                   "Value": "0D"
                 }
               }
             },
-            "secFontSize": {
+            "end": {
               "expr": {
                 "Literal": {
-                  "Value": "9D"
+                  "Value": "26000000D"
                 }
               }
             },
-            "secLabelColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#64748B'"
-                    }
-                  }
+            "secShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "secStart": {
+              "expr": {
+                "Literal": {
+                  "Value": "-0.12D"
+                }
+              }
+            },
+            "secEnd": {
+              "expr": {
+                "Literal": {
+                  "Value": "0.125D"
                 }
               }
             },

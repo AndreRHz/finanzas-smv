@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "7611d1fcae7cf4ac1028",
   "position": {
     "x": 32,
@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Un negocio más chico pero más rentable: el margen bruto pasó de 18.0% (2022) a 26.4% (2025)",
+                    "value": "El margen bruto se recuperó del bache de 2022 (18.0%) y hoy supera su nivel de 2020: 26.4% vs. 23.7%",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
                       "fontSize": "24px",

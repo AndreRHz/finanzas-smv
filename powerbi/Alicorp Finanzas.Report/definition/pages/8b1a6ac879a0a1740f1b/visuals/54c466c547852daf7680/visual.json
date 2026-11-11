@@ -1,10 +1,10 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "54c466c547852daf7680",
   "position": {
     "x": 32,
     "y": 32,
-    "width": 760,
+    "width": 920,
     "height": 64,
     "z": 1000,
     "tabOrder": 1000
@@ -19,10 +19,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Alicorp: ventas, rentabilidad y retorno al accionista",
+                    "value": "Alicorp gana más por cada sol vendido, pero su ROE de 25.7% se apoya en mayor deuda",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "24px",
+                      "fontSize": "20px",
                       "color": "#0F172A"
                     }
                   }

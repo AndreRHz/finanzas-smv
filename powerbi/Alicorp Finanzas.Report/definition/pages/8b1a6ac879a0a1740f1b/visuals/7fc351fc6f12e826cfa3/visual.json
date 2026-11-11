@@ -1,11 +1,11 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "7fc351fc6f12e826cfa3",
   "position": {
     "x": 32,
-    "y": 896,
+    "y": 984,
     "width": 1856,
-    "height": 152,
+    "height": 64,
     "z": 12000,
     "tabOrder": 12000
   },
@@ -19,24 +19,19 @@
               {
                 "textRuns": [
                   {
-                    "value": "Nota metodológica",
+                    "value": "Nota metodológica. ",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "15px",
+                      "fontSize": "12px",
                       "color": "#0F172A",
                       "fontWeight": "bold"
                     }
-                  }
-                ],
-                "horizontalTextAlignment": "left"
-              },
-              {
-                "textRuns": [
+                  },
                   {
-                    "value": "Fuente: Superintendencia del Mercado de Valores (SMV), estados financieros anuales consolidados de Alicorp S.A.A., reportes 2021-2025 (cifras 2020-2025). Montos en miles de S/.",
+                    "value": "Fuente: SMV, estados financieros anuales consolidados de Alicorp S.A.A., reportes 2021-2025 (cifras 2020-2025). Montos en miles de S/. Análisis independiente, sin afiliación con la empresa.",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "14px",
+                      "fontSize": "12px",
                       "color": "#475569"
                     }
                   }
@@ -46,23 +41,10 @@
               {
                 "textRuns": [
                   {
-                    "value": "Cada año usa la última versión publicada. Las variaciones YoY comparan ambos años dentro del mismo reporte para mantener la misma clasificación de operaciones continuadas; \"n.s.\" = no significativo (año anterior negativo). ROE y ROA usan saldos promedio (2020 sin dato).",
+                    "value": "Cada año usa la última versión publicada. Las variaciones YoY comparan ambos años dentro del mismo reporte (misma clasificación de operaciones continuadas); \"n.s.\" = no significativo (año anterior negativo). ROE y ROA sobre saldos promedio (2020 sin dato).",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "14px",
-                      "color": "#475569"
-                    }
-                  }
-                ],
-                "horizontalTextAlignment": "left"
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Análisis independiente, sin afiliación con la empresa.",
-                    "textStyle": {
-                      "fontFamily": "Segoe UI",
-                      "fontSize": "14px",
+                      "fontSize": "12px",
                       "color": "#475569"
                     }
                   }
@@ -150,28 +132,28 @@
             "top": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "8D"
                 }
               }
             },
             "bottom": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "8D"
                 }
               }
             },
             "left": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "8D"
                 }
               }
             },
             "right": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
+                  "Value": "8D"
                 }
               }
             }

@@ -128,28 +128,163 @@ table 'Estado de Resultados'
 		displayFolder: Márgenes
 		lineageTag: 7727d198-87cf-4f40-9d84-16096c524261
 
-	/// Frase dinámica para el subtítulo de la página Resumen: ventas del año, variación YoY comparable (n.s. si el año anterior fue negativo), utilidad neta y ROE.
+	/// Frase dinámica para el subtítulo de la página Resumen: descomposición DuPont del ROE del año (margen neto controladora × rotación de activos × apalancamiento) y la del año anterior. No repite los valores de las tarjetas.
 	measure 'Subtítulo resumen' =
 			VAR _anio = MAX ( 'Año'[Año] )
-			VAR _ventas = [Ventas]
-			VAR _anterior = [Ventas año anterior]
-			VAR _textoYoY =
-			    IF (
-			        ISBLANK ( _anterior ),
-			        "sin año anterior comparable",
-			        IF ( _anterior < 0, "n.s.", FORMAT ( [Ventas YoY %], "▲ 0.0%;▼ 0.0%;0.0%" ) ) & " vs " & ( _anio - 1 )
-			    )
-			VAR _roe = [ROE %]
+			VAR _margen = [Margen neto controladora % (DuPont)]
+			VAR _rotacion = [Rotación de activos (DuPont)]
+			VAR _apal = [Apalancamiento (DuPont)]
+			VAR _margenAnt = CALCULATE ( [Margen neto controladora % (DuPont)], 'Año'[Año] = _anio - 1 )
+			VAR _rotacionAnt = CALCULATE ( [Rotación de activos (DuPont)], 'Año'[Año] = _anio - 1 )
+			VAR _apalAnt = CALCULATE ( [Apalancamiento (DuPont)], 'Año'[Año] = _anio - 1 )
 			RETURN
 			    IF (
 			        HASONEVALUE ( 'Año'[Año] ),
-			        _anio & " · Ventas S/ " & FORMAT ( _ventas, "#,##0" ) & " mil (" & _textoYoY & ")"
-			            & " · Utilidad neta S/ " & FORMAT ( [Utilidad neta], "#,##0" ) & " mil"
-			            & " · ROE " & IF ( ISBLANK ( _roe ), "n.d.", FORMAT ( _roe, "0.0%" ) ),
+			        IF (
+			            ISBLANK ( _apal ),
+			            _anio & " · Sin descomposición del ROE: requiere los saldos del año anterior",
+			            _anio & " · El ROE se explica por margen neto × rotación de activos × apalancamiento: "
+			                & FORMAT ( _margen, "0.0%" ) & " × " & FORMAT ( _rotacion, "0.00" ) & "x × " & FORMAT ( _apal, "0.00" ) & "x"
+			                & IF (
+			                    NOT ISBLANK ( _apalAnt ),
+			                    " (" & ( _anio - 1 ) & ": " & FORMAT ( _margenAnt, "0.0%" ) & " × " & FORMAT ( _rotacionAnt, "0.00" ) & "x × " & FORMAT ( _apalAnt, "0.00" ) & "x)"
+			                )
+			        ),
 			        "Selecciona un año"
 			    )
 		displayFolder: Narrativa
 		lineageTag: 68e4b1dd-511a-4b72-8b63-1fb9204c92c7
+
+	/// 1 si la cuenta de la fila es un subtotal del Estado de Resultados (Es subtotal), 0 si no. Para el formato condicional de la matriz de la página 2.
+	measure 'Fila subtotal' = IF ( SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () ), 1, 0 )
+		formatString: 0
+		isHidden
+		displayFolder: Formato
+		lineageTag: e1bb211f-c059-4e2f-96ff-269f353d7761
+
+	/// Tramo invisible bajo cada paso de variación (acumulado previo). Serie del gráfico de cascada por columnas apiladas (Paso cascada en el eje). Miles de S/.
+	measure 'Cascada base' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			VAR _delta = [Monto]
+			VAR _a =
+			    CALCULATE (
+			        [Monto],
+			        REMOVEFILTERS ( 'Cuenta Resultados' ),
+			        'Cuenta Resultados'[Orden cascada] < _k,
+			        NOT ISBLANK ( 'Cuenta Resultados'[Orden cascada] ),
+			        'Cuenta Resultados'[Tipo de fila] = "detalle"
+			    ) + 0
+			VAR _b = _a + _delta
+			VAR _cruza = _a * _b < 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && NOT ISBLANK ( _delta ) && NOT _esTotal && NOT _cruza,
+			        IF ( MIN ( _a, _b ) >= 0, MIN ( _a, _b ), MAX ( _a, _b ) )
+			    )
+		formatString: #,##0
+		displayFolder: Cascada
+		lineageTag: a50208e7-5e40-438c-8111-96d4b9fd52ee
+
+	/// Barras de ventas y subtotales (utilidad bruta, operativa, antes de impuestos, continuadas y neta), desde cero. Serie del gráfico de cascada por columnas apiladas. Miles de S/.
+	measure 'Cascada total' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			RETURN
+			    IF ( HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && _esTotal, [Monto] )
+		formatString: #,##0
+		displayFolder: Cascada
+		lineageTag: 7d11cbe4-e2b2-42b7-8e81-cec80e9a50cf
+
+	/// Tramo visible de un paso que suma. La cadena de formato muestra la variación del paso con signo. Serie del gráfico de cascada por columnas apiladas. Miles de S/.
+	measure 'Cascada aumento' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			VAR _delta = [Monto]
+			VAR _a =
+			    CALCULATE (
+			        [Monto],
+			        REMOVEFILTERS ( 'Cuenta Resultados' ),
+			        'Cuenta Resultados'[Orden cascada] < _k,
+			        NOT ISBLANK ( 'Cuenta Resultados'[Orden cascada] ),
+			        'Cuenta Resultados'[Tipo de fila] = "detalle"
+			    ) + 0
+			VAR _b = _a + _delta
+			VAR _cruza = _a * _b < 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && NOT _esTotal && _delta > 0,
+			        IF ( _cruza, MAX ( _a, _b ), IF ( MIN ( _a, _b ) >= 0, ABS ( _delta ), -ABS ( _delta ) ) )
+			    )
+		displayFolder: Cascada
+		lineageTag: 2aa38286-7c45-4ff6-9e5b-24f061dbe405
+
+		formatStringDefinition = """" & FORMAT ( [Monto], "+#,##0;(#,##0);0" ) & """"
+
+	/// Tramo visible de un paso que resta. La cadena de formato muestra la variación del paso entre paréntesis. Serie del gráfico de cascada por columnas apiladas. Miles de S/.
+	measure 'Cascada disminución' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			VAR _delta = [Monto]
+			VAR _a =
+			    CALCULATE (
+			        [Monto],
+			        REMOVEFILTERS ( 'Cuenta Resultados' ),
+			        'Cuenta Resultados'[Orden cascada] < _k,
+			        NOT ISBLANK ( 'Cuenta Resultados'[Orden cascada] ),
+			        'Cuenta Resultados'[Tipo de fila] = "detalle"
+			    ) + 0
+			VAR _b = _a + _delta
+			VAR _cruza = _a * _b < 0
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && NOT _esTotal && _delta < 0,
+			        IF ( _cruza, MAX ( _a, _b ), IF ( MIN ( _a, _b ) >= 0, ABS ( _delta ), -ABS ( _delta ) ) )
+			    )
+		displayFolder: Cascada
+		lineageTag: a7434fe5-68cf-40d1-af33-de699a74be69
+
+		formatStringDefinition = """" & FORMAT ( [Monto], "+#,##0;(#,##0);0" ) & """"
+
+	/// Parte bajo cero de un paso que suma y cruza el eje (de pérdida a utilidad). Serie del gráfico de cascada por columnas apiladas. Miles de S/.
+	measure 'Cascada aumento bajo cero' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			VAR _delta = [Monto]
+			VAR _a =
+			    CALCULATE (
+			        [Monto],
+			        REMOVEFILTERS ( 'Cuenta Resultados' ),
+			        'Cuenta Resultados'[Orden cascada] < _k,
+			        NOT ISBLANK ( 'Cuenta Resultados'[Orden cascada] ),
+			        'Cuenta Resultados'[Tipo de fila] = "detalle"
+			    ) + 0
+			VAR _b = _a + _delta
+			RETURN
+			    IF ( HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && NOT _esTotal && _delta > 0 && _a * _b < 0, MIN ( _a, _b ) )
+		formatString: #,##0
+		displayFolder: Cascada
+		lineageTag: c26f8f8e-e096-4b5b-bde7-1ab555a95b62
+
+	/// Parte bajo cero de un paso que resta y cruza el eje (p. ej. 2021: de utilidad de operaciones continuadas a pérdida neta). Serie del gráfico de cascada por columnas apiladas. Miles de S/.
+	measure 'Cascada disminución bajo cero' =
+			VAR _k = MAX ( 'Cuenta Resultados'[Orden cascada] )
+			VAR _esTotal = _k = 1 || SELECTEDVALUE ( 'Cuenta Resultados'[Es subtotal], FALSE () )
+			VAR _delta = [Monto]
+			VAR _a =
+			    CALCULATE (
+			        [Monto],
+			        REMOVEFILTERS ( 'Cuenta Resultados' ),
+			        'Cuenta Resultados'[Orden cascada] < _k,
+			        NOT ISBLANK ( 'Cuenta Resultados'[Orden cascada] ),
+			        'Cuenta Resultados'[Tipo de fila] = "detalle"
+			    ) + 0
+			VAR _b = _a + _delta
+			RETURN
+			    IF ( HASONEVALUE ( 'Cuenta Resultados'[Paso cascada] ) && NOT _esTotal && _delta < 0 && _a * _b < 0, MIN ( _a, _b ) )
+		formatString: #,##0
+		displayFolder: Cascada
+		lineageTag: 6cdeacbf-dbaf-4dab-8b5e-416cd7285ffe
 
 	/// Frase dinámica para el subtítulo de la página de cascada: de las ventas del año cuánto queda como utilidad (o pérdida) neta.
 	measure 'Subtítulo cascada' =

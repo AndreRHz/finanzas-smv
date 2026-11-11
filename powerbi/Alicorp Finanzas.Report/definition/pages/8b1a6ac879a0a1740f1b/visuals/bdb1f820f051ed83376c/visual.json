@@ -1,5 +1,5 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "bdb1f820f051ed83376c",
   "position": {
     "x": 32,
@@ -233,7 +233,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Resumen del año seleccionado: ventas, variación, utilidad neta y ROE'"
+                  "Value": "'Descomposición del ROE del año seleccionado y del anterior: margen neto, rotación de activos y apalancamiento'"
                 }
               }
             }

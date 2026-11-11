@@ -16,7 +16,7 @@ const PAGINAS = join(DEF, "pages");
 
 const SCHEMA_PAGE = "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json";
 const SCHEMA_PAGES = "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json";
-const SCHEMA_VISUAL = "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json";
+const SCHEMA_VISUAL = "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json";
 
 // ---------------------------------------------------------------- paleta (Design Brief)
 const C = {
@@ -120,20 +120,35 @@ function textoTitulo(id, pos, texto, tam = 24) {
   });
 }
 
-function textoNota(id, pos, lineas) {
+// Nota compacta: cada párrafo es [[texto, negrita?], ...] en 12px.
+function textoNota(id, pos, parrafos) {
   return contenedor(id, pos, {
     visualType: "textbox",
     objects: {
       general: [{
         properties: {
-          paragraphs: lineas.map((l, i) => ({
-            textRuns: [{ value: l, textStyle: { fontFamily: "Segoe UI", fontSize: i === 0 ? "15px" : "14px", color: i === 0 ? C.titulo : C.pizarra, ...(i === 0 ? { fontWeight: "bold" } : {}) } }],
+          paragraphs: parrafos.map((runs) => ({
+            textRuns: runs.map(([t, negrita]) => ({ value: t, textStyle: { fontFamily: "Segoe UI", fontSize: "12px", color: negrita ? C.titulo : C.pizarra, ...(negrita ? { fontWeight: "bold" } : {}) } })),
             horizontalTextAlignment: "left",
           })),
         },
       }],
     },
-    visualContainerObjects: { ...vcoPanel({ padding: 16 }) },
+    visualContainerObjects: { ...vcoPanel({ padding: 8 }) },
+  });
+}
+
+// Conclusión destacada (una frase) en un panel.
+function textoDestacado(id, pos, texto) {
+  return contenedor(id, pos, {
+    visualType: "textbox",
+    objects: {
+      general: [{ properties: { paragraphs: [{ textRuns: [{ value: texto, textStyle: { fontFamily: "Segoe UI Semibold", fontSize: "15px", color: C.titulo } }], horizontalTextAlignment: "left" }] } }],
+    },
+    visualContainerObjects: {
+      ...vcoPanel({ padding: 12 }),
+      general: [{ properties: { altText: str(texto) } }],
+    },
   });
 }
 
@@ -196,9 +211,13 @@ function tarjeta(id, pos, [t, m], etiqueta, { ref, refTitulo, acento = C.acento,
   };
   const query = { queryState: { Data: { projections: [M(t, m)] } } };
   if (ref) {
-    objects.referenceLabel = [{ properties: { value: { expr: med(ref[0], ref[1]) } }, selector: { data: [{ dataViewWildcard: { matchingOption: 1 } }], metadata: qref(t, m), id: hid(id + "ref", 8) } }];
+    // El título de la etiqueta de referencia es por instancia: usa el mismo selector que la etiqueta
+    // (con selector { id: "default" } Desktop ignoraba el texto personalizado y mostraba el nombre de la medida).
+    const selRef = { data: [{ dataViewWildcard: { matchingOption: 1 } }], metadata: qref(t, m), id: hid(id + "ref", 8) };
+    objects.referenceLabel = [{ properties: { value: { expr: med(ref[0], ref[1]) } }, selector: selRef }];
     objects.referenceLabelLayout = [{ properties: { position: str("below") } }];
-    objects.referenceLabelTitle = [{ properties: { show: bool(true), titleContentType: str("custom"), titleText: str(refTitulo ?? "vs año anterior"), titleFontSize: num(10), titleFontColor: color(C.tenue) }, selector: { id: "default" } }];
+    const tituloRef = { show: bool(true), titleContentType: str("custom"), titleText: str(refTitulo ?? "vs año anterior"), titleFontSize: num(10), titleFontColor: color(C.tenue) };
+    objects.referenceLabelTitle = [{ properties: tituloRef, selector: { id: "default" } }, { properties: tituloRef, selector: selRef }];
   }
   return contenedor(id, pos, { visualType: "cardVisual", query, objects, visualContainerObjects: { ...vcoPanel({ padding: 8 }), general: [{ properties: { altText: str(`${etiqueta} del año seleccionado`) } }] } });
 }
@@ -223,7 +242,8 @@ const leyendaArriba = [{ properties: { show: bool(true), position: str("Top"), f
 const ejeCategorico = [{ properties: { axisType: str("Categorical"), fontSize: num(10), labelColor: color(C.tenue), showAxisTitle: bool(false), gridlineShow: bool(false) } }];
 const colorSerie = (t, m, hex) => ({ properties: { fill: color(hex) }, selector: { metadata: qref(t, m) } });
 
-function grafico(id, pos, tipo, { categoria = ANIO, y = [], y2 = [], titulo, subtitulo: sub, alt, colores = {}, miles = false, leyenda = true, filtros = [], extraObjects = {}, etiquetasSolo, etiquetaBlanca = [] }) {
+function grafico(id, pos, tipo, { categoria = ANIO, y = [], y2 = [], titulo, subtitulo: sub, alt, colores = {}, miles = false, leyenda = true, filtros = [], extraObjects = {}, etiquetasSolo, etiquetaBlanca = [], posEtiquetas = {}, propsEtiquetas = {} }) {
+  const tablaDe = (m) => [...y, ...y2].find(([, mm]) => mm === m)[0];
   const queryState = { Category: { projections: [K(...categoria)] } };
   if (y.length) queryState.Y = { projections: y.map(([t, m]) => M(t, m)) };
   if (y2.length) queryState.Y2 = { projections: y2.map(([t, m]) => M(t, m)) };
@@ -231,10 +251,12 @@ function grafico(id, pos, tipo, { categoria = ANIO, y = [], y2 = [], titulo, sub
     categoryAxis: ejeCategorico,
     legend: leyenda ? leyendaArriba : [{ properties: { show: bool(false) } }],
     labels: [
-      { properties: { show: bool(true), fontSize: num(9), color: color(C.texto), ...(miles ? { labelDisplayUnits: num(1) } : {}) } },
+      { properties: { show: bool(true), fontSize: num(9), color: color(C.texto), ...(miles ? { labelDisplayUnits: num(1) } : {}), ...propsEtiquetas } },
       // etiquetas solo en algunas series (evita superposición)
       ...(etiquetasSolo ? [...y, ...y2].filter(([, m]) => !etiquetasSolo.includes(m)).map(([t, m]) => ({ properties: { showSeries: bool(false) }, selector: { metadata: qref(t, m) } })) : []),
       ...etiquetaBlanca.map(([t, m]) => ({ properties: { color: color("#FFFFFF") }, selector: { metadata: qref(t, m) } })),
+      // posición por serie (p. ej. una línea arriba y otra abajo para que no se encimen)
+      ...Object.entries(posEtiquetas).map(([m, p]) => ({ properties: { labelPosition: str(p) }, selector: { metadata: qref(tablaDe(m), m) } })),
     ],
     dataPoint: [...y, ...y2].map(([t, m]) => colorSerie(t, m, colores[m] ?? C.acento)),
     ...(tipo === "lineChart" || tipo.endsWith("ComboChart") ? { lineStyles: [{ properties: { lineChartType: str("linear"), areaShow: bool(false), strokeWidth: num(3) } }] } : {}),
@@ -249,38 +271,53 @@ function grafico(id, pos, tipo, { categoria = ANIO, y = [], y2 = [], titulo, sub
   return contenedor(id, pos, visual, filtros.length ? { filterConfig: { filters: filtros } } : {});
 }
 
-function matriz(id, pos, { filas, columnas, valores, titulo, subtitulo: sub, alt, filtros = [], fuente = 10 }) {
+// Matriz plana: `filas` = [tabla, columna]; sin subtotales ni total general.
+// `resaltar`: [tabla, medida] que vale 1 en las filas a resaltar (formato condicional: fondo gris claro y texto oscuro).
+function matriz(id, pos, { filas, columnas, valores, titulo, subtitulo: sub, alt, filtros = [], fuente = 10, resaltar }) {
   const queryState = { Rows: { projections: [K(...filas)] }, Values: { projections: valores.map(([t, m, nombre]) => ({ ...M(t, m), ...(nombre ? { displayName: nombre } : {}) })) } };
   if (columnas) queryState.Columns = { projections: [K(...columnas)] };
-  return contenedor(id, pos, {
+  const visual = {
     visualType: "pivotTable",
     query: { queryState },
     objects: {
-      columnHeaders: [{ properties: { autoSizeColumnWidth: bool(true), columnAdjustment: str("growToFit"), fontSize: num(fuente), bold: bool(true), fontColor: color(C.titulo), backColor: color("#F8FAFC") } }],
+      // encabezados alineados a la derecha, igual que las cifras
+      columnHeaders: [{ properties: { autoSizeColumnWidth: bool(true), columnAdjustment: str("growToFit"), fontSize: num(fuente), bold: bool(true), fontColor: color(C.titulo), backColor: color("#F8FAFC"), alignment: str("Right") } }],
       rowHeaders: [{ properties: { fontSize: num(fuente), fontColor: color(C.texto), wordWrap: bool(false) } }],
       values: [{ properties: { fontSize: num(fuente), fontColorPrimary: color(C.texto), fontColorSecondary: color(C.texto), backColorPrimary: color(C.panel), backColorSecondary: color("#F8FAFC") } }],
       subTotals: [{ properties: { rowSubtotals: bool(false), columnSubtotals: bool(false) } }],
     },
     visualContainerObjects: { ...vcoPanel({ titulo, subtitulo: sub, alt }), stylePreset: [{ properties: { name: str("None") } }] },
-  }, filtros.length ? { filterConfig: { filters: filtros } } : {});
+  };
+  if (resaltar) {
+    // regla: si [resaltar] = 1 → color; por defecto el color normal de la fila
+    const regla = (si, no) => ({ solid: { color: { expr: { Conditional: {
+      Cases: [{ Condition: { Comparison: { ComparisonKind: 0, Left: med(...resaltar), Right: { Literal: { Value: "1D" } } } }, Value: { Literal: { Value: `'${si}'` } } }],
+      DefaultValue: { Literal: { Value: `'${no}'` } },
+    } } } } });
+    const cf = { backColor: regla("#E2E8F0", C.panel), fontColor: regla(C.titulo, C.texto) };
+    // celdas de valores (selector obligatorio en matrices: dataViewWildcard + metadata del valor)
+    for (const [t, m] of valores) visual.objects.values.push({ properties: cf, selector: { data: [{ dataViewWildcard: { matchingOption: 1 } }], metadata: qref(t, m) } });
+    // encabezado de fila (nombre de la cuenta), mismo criterio
+    visual.objects.rowHeaders.push({ properties: cf, selector: { data: [{ dataViewWildcard: { matchingOption: 1 } }], metadata: qref(...filas) } });
+  }
+  return contenedor(id, pos, visual, filtros.length ? { filterConfig: { filters: filtros } } : {});
 }
 
 // ---------------------------------------------------------------- páginas
 const notaMetodologica = [
-  "Nota metodológica",
-  "Fuente: Superintendencia del Mercado de Valores (SMV), estados financieros anuales consolidados de Alicorp S.A.A., reportes 2021-2025 (cifras 2020-2025). Montos en miles de S/.",
-  "Cada año usa la última versión publicada. Las variaciones YoY comparan ambos años dentro del mismo reporte para mantener la misma clasificación de operaciones continuadas; \"n.s.\" = no significativo (año anterior negativo). ROE y ROA usan saldos promedio (2020 sin dato).",
-  "Análisis independiente, sin afiliación con la empresa.",
+  [["Nota metodológica. ", true], ["Fuente: SMV, estados financieros anuales consolidados de Alicorp S.A.A., reportes 2021-2025 (cifras 2020-2025). Montos en miles de S/. Análisis independiente, sin afiliación con la empresa.", false]],
+  [["Cada año usa la última versión publicada. Las variaciones YoY comparan ambos años dentro del mismo reporte (misma clasificación de operaciones continuadas); \"n.s.\" = no significativo (año anterior negativo). ROE y ROA sobre saldos promedio (2020 sin dato).", false]],
 ];
 
 function paginaResumen() {
   const p = "resumen";
-  const R = { header: [1, 1, 6, 2], nav: [6, 1, 10, 2], filters: [10, 1, 13, 2], context: [1, 2, 13, 3], kpis: [1, 3, 13, 5], trend: [1, 5, 8, 11], split: [8, 5, 13, 11], notes: [1, 11, 13, 13] };
+  // la nota ocupa una sola fila de la grilla; los gráficos ganan la fila liberada
+  const R = { header: [1, 1, 7, 2], nav: [7, 1, 11, 2], filters: [11, 1, 13, 2], context: [1, 2, 13, 3], kpis: [1, 3, 13, 5], trend: [1, 5, 8, 12], split: [8, 5, 13, 12], notes: [1, 12, 13, 13] };
   const v = {};
-  v.titulo = textoTitulo(hid(p + "titulo"), region(R.header), "Alicorp: ventas, rentabilidad y retorno al accionista");
+  v.titulo = textoTitulo(hid(p + "titulo"), region(R.header), "Alicorp gana más por cada sol vendido, pero su ROE de 25.7% se apoya en mayor deuda", 20);
   v.nav = navegador(hid(p + "nav"), region(R.nav));
   v.anio = slicerAnio(hid(p + "anio"), region(R.filters));
-  v.sub = subtitulo(hid(p + "sub"), region(R.context), [ER, "Subtítulo resumen"], "Resumen del año seleccionado: ventas, variación, utilidad neta y ROE");
+  v.sub = subtitulo(hid(p + "sub"), region(R.context), [ER, "Subtítulo resumen"], "Descomposición del ROE del año seleccionado y del anterior: margen neto, rotación de activos y apalancamiento");
   v.k1 = tarjeta(hid(p + "k1"), region(R.kpis, 1, 5), [ER, "Ventas"], "Ventas (miles de S/)", { ref: [CMP, "Ventas YoY %"] });
   v.k2 = tarjeta(hid(p + "k2"), region(R.kpis, 2, 5), [ER, "Utilidad operativa"], "Utilidad operativa (miles de S/)", { ref: [CMP, "Utilidad operativa YoY %"], acento: C.pizarra });
   v.k3 = tarjeta(hid(p + "k3"), region(R.kpis, 3, 5), [ER, "Margen operativo %"], "Margen operativo", { ref: [ER, "Margen bruto %"], refTitulo: "Margen bruto", acento: C.pizarra, unidades: false });
@@ -291,7 +328,10 @@ function paginaResumen() {
     titulo: "Ventas y margen operativo, 2020-2025", subtitulo: "Columnas: ventas (miles de S/) · Línea: margen operativo",
     alt: "Ventas por año en columnas y margen operativo en línea, 2020-2025. Las ventas tocan su máximo en 2022 y el margen operativo es el más alto en 2024 (10.2%).",
     colores: { "Ventas": C.acento, "Margen operativo %": C.pizarra },
-    extraObjects: { valueAxis: [{ properties: { show: bool(false), secShow: bool(true), secStart: num(0), secFontSize: num(9), secLabelColor: color(C.tenue), gridlineShow: bool(false) } }] },
+    posEtiquetas: { "Margen operativo %": "Above" },
+    // Rangos fijos para separar capas: columnas en la mitad inferior (máx. 15.4 MM < 26 MM) y la línea del
+    // margen (7%-10%) en la franja superior (eje secundario de -12% a 12.5%), así sus etiquetas no se enciman.
+    extraObjects: { valueAxis: [{ properties: { show: bool(false), start: num(0), end: num(26000000), secShow: bool(false), secStart: num(-0.12), secEnd: num(0.125), gridlineShow: bool(false) } }] },
   });
   v.split = grafico(hid(p + "split"), region(R.split), "lineStackedColumnComboChart", {
     y: [[ER, "Utilidad operaciones continuadas"], [ER, "Resultado operaciones discontinuadas"]], y2: [[ER, "Utilidad neta"]], miles: true,
@@ -314,29 +354,59 @@ function paginaCascada() {
   v.nav = navegador(hid(p + "nav"), region(R.nav));
   v.anio = slicerAnio(hid(p + "anio"), region(R.filters));
   v.sub = subtitulo(hid(p + "sub"), region(R.context), [ER, "Subtítulo cascada"], "De las ventas del año seleccionado cuánto queda como utilidad neta");
+  // Cascada como columnas apiladas: el gráfico de cascada nativo no permite renombrar su barra "Total"
+  // ni mostrar subtotales intermedios. Serie invisible (base) + tramos que suman/restan + barras de subtotal;
+  // los tramos "bajo cero" cubren un paso que cruza el eje (2021: de utilidad de continuadas a pérdida neta).
+  // Las etiquetas de los tramos muestran la variación del paso (cadena de formato dinámica de la medida).
+  const serieCascada = [
+    ["Cascada base", null], ["Cascada total", C.acento], ["Cascada aumento", C.mejora], ["Cascada disminución", C.deterioro],
+    ["Cascada aumento bajo cero", C.mejora], ["Cascada disminución bajo cero", C.deterioro],
+  ];
+  const conEtiqueta = ["Cascada total", "Cascada aumento", "Cascada disminución"];
   v.cascada = contenedor(hid(p + "cascada"), region(R.hero), {
-    visualType: "waterfallChart",
+    visualType: "columnChart",
     query: {
-      queryState: { Category: { projections: [K("Cuenta Resultados", "Paso cascada")] }, Y: { projections: [M(ER, "Monto")] } },
+      // Tooltips: solo el paso (categoría) y su monto; las series auxiliares no aparecen (showTooltipFieldsOnly)
+      queryState: {
+        Category: { projections: [K("Cuenta Resultados", "Paso cascada")] },
+        Y: { projections: serieCascada.map(([m]) => M(ER, m)) },
+        Tooltips: { projections: [{ ...M(ER, "Monto"), displayName: "Monto (miles de S/)" }] },
+      },
       sortDefinition: { sort: [{ field: col("Cuenta Resultados", "Paso cascada"), direction: "Ascending" }], isDefaultSort: false },
     },
     objects: {
-      sentimentColors: [{ properties: { increaseFill: color(C.mejora), decreaseFill: color(C.deterioro), totalFill: color(C.acento) } }],
-      labels: [{ properties: { show: bool(true), fontSize: num(9), color: color(C.texto), labelDisplayUnits: num(1) } }],
-      categoryAxis: [{ properties: { fontSize: num(10), labelColor: color(C.tenue), showAxisTitle: bool(false) } }],
+      dataPoint: serieCascada.map(([m, hex]) => ({ properties: hex ? { fill: color(hex) } : { fill: color(C.panel), fillTransparency: num(100) }, selector: { metadata: qref(ER, m) } })),
+      labels: [
+        // columnas apiladas no admiten OutsideEnd: etiqueta en el extremo interior, con fondo blanco para leerse sobre cualquier color
+        // (sin `color` de texto: el validador lo confunde con el color del fondo; el texto por defecto es oscuro)
+        { properties: { show: bool(true), fontSize: num(8), labelPosition: str("InsideEnd"), labelOverflow: bool(true), labelDisplayUnits: num(1), enableBackground: bool(true), backgroundColor: color(C.panel), backgroundTransparency: num(10) } },
+        ...serieCascada.filter(([m]) => !conEtiqueta.includes(m)).map(([m]) => ({ properties: { showSeries: bool(false) }, selector: { metadata: qref(ER, m) } })),
+        // texto oscuro por serie (Desktop usaba blanco automático sobre el fondo blanco de la etiqueta)
+        ...conEtiqueta.map((m) => ({ properties: { color: color(C.titulo) }, selector: { metadata: qref(ER, m) } })),
+      ],
+      // columnas más anchas (menos espacio entre categorías) para que quepan cifras de 8 dígitos
+      categoryAxis: [{ properties: { axisType: str("Categorical"), fontSize: num(10), labelColor: color(C.tenue), showAxisTitle: bool(false), gridlineShow: bool(false), innerPadding: num(12) } }],
       valueAxis: [{ properties: { show: bool(false), gridlineShow: bool(false) } }],
       legend: [{ properties: { show: bool(false) } }],
     },
-    visualContainerObjects: vcoPanel({
-      titulo: "Cascada del año seleccionado (miles de S/)", subtitulo: "Verde suma · rojo resta · total = utilidad neta",
-      alt: "Cascada desde ventas hasta utilidad neta del año seleccionado: costo de ventas, gastos, otros operativos, resultado financiero, impuesto y operaciones discontinuadas.",
-    }),
-  }, { filterConfig: { filters: [filtroIn(p + "detalle", "Cuenta Resultados", "Tipo de fila", ["'detalle'"]), filtroIn(p + "paso", "Cuenta Resultados", "Paso cascada", ["null"], { negar: true })] } });
+    visualContainerObjects: {
+      ...vcoPanel({
+        titulo: "Cascada del año seleccionado (miles de S/)", subtitulo: "Verde suma · rojo resta · azul: ventas y subtotales, hasta la utilidad neta",
+        alt: "Cascada desde ventas hasta utilidad neta del año seleccionado, con subtotales de utilidad bruta, operativa, antes de impuestos y de operaciones continuadas.",
+      }),
+      visualTooltip: [{ properties: { show: bool(true), type: str("Default"), showTooltipFieldsOnly: bool(true) } }],
+    },
+  }, { filterConfig: { filters: [filtroIn(p + "paso", "Cuenta Resultados", "Paso cascada", ["null"], { negar: true })] } });
   v.matriz = matriz(hid(p + "matriz"), region(R.detail), {
+    // lista plana en orden contable (Cuenta se ordena por Orden), sin total general; subtotales resaltados por Es subtotal
     filas: ["Cuenta Resultados", "Cuenta"], columnas: ANIO, valores: [[ER, "Monto"]],
-    titulo: "Estado de Resultados 2020-2025 (miles de S/)", subtitulo: "Última versión publicada de cada año",
-    alt: "Matriz del Estado de Resultados por cuenta y año, 2020-2025, en miles de soles.",
-    filtros: [filtroIn(p + "mostrar", "Cuenta Resultados", "Mostrar", ["true"]), filtroIn(p + "upa", "Cuenta Resultados", "Grupo", ["'UPA'"], { negar: true })],
+    resaltar: [ER, "Fila subtotal"],
+    titulo: "Estado de Resultados 2020-2025 (miles de S/)", subtitulo: "Última versión publicada de cada año · en orden contable; filas resaltadas: subtotales (utilidad bruta, operativa, antes de impuestos, continuadas y neta)",
+    alt: "Matriz del Estado de Resultados por cuenta y año, 2020-2025, en miles de soles, en orden contable desde ventas hasta la utilidad neta y su atribución; los subtotales están resaltados.",
+    filtros: [
+      filtroIn(p + "mostrar", "Cuenta Resultados", "Mostrar", ["true"]),
+      filtroIn(p + "upa", "Cuenta Resultados", "Grupo", ["'UPA'"], { negar: true }),
+    ],
   });
   const interacciones = [{ source: v.anio.name, target: v.matriz.name, type: "NoFilter" }];
   return { nombre: hid("pagina-cascada"), titulo: "Estado de Resultados en cascada", visuales: Object.values(v), interacciones };
@@ -346,7 +416,7 @@ function paginaMargenes() {
   const p = "margenes";
   const R = { header: [1, 1, 9, 2], nav: [9, 1, 13, 2], tl: [1, 2, 7, 7], tr: [7, 2, 13, 7], bl: [1, 7, 7, 13], br: [7, 7, 13, 13] };
   const v = {};
-  v.titulo = textoTitulo(hid(p + "titulo"), region(R.header), "Un negocio más chico pero más rentable: el margen bruto pasó de 18.0% (2022) a 26.4% (2025)");
+  v.titulo = textoTitulo(hid(p + "titulo"), region(R.header), "El margen bruto se recuperó del bache de 2022 (18.0%) y hoy supera su nivel de 2020: 26.4% vs. 23.7%");
   v.nav = navegador(hid(p + "nav"), region(R.nav));
   v.margenes = grafico(hid(p + "margenes"), region(R.tl), "lineChart", {
     y: [[ER, "Margen bruto %"], [ER, "Margen operativo %"], [ER, "Margen continuadas %"], [ER, "Margen neto %"]],
@@ -361,8 +431,14 @@ function paginaMargenes() {
     titulo: "Crecimiento vs. año anterior (comparable)", subtitulo: "Ambos años del mismo reporte: misma clasificación de operaciones continuadas",
     alt: "Variación anual de ventas y utilidad operativa 2021-2025 con base comparable. Ventas: +30.8%, +26.1%, -11.3%, -4.0%, +11.0%.",
     colores: { "Ventas YoY %": C.acento, "Utilidad operativa YoY %": C.pizarra },
+    // Power BI ocultaba la etiqueta de Utilidad operativa 2022 (+29.8%) porque chocaba con la de Ventas: sin optimización
+    // de etiquetas y con columnas más anchas (menos espacio entre años) cada etiqueta cabe sobre su barra
+    propsEtiquetas: { optimizeLabelDisplay: bool(false) },
     filtros: [filtroDesde2021(p + "desde2021")],
-    extraObjects: { valueAxis: [{ properties: { show: bool(false), gridlineShow: bool(false) } }] },
+    extraObjects: {
+      valueAxis: [{ properties: { show: bool(false), gridlineShow: bool(false) } }],
+      categoryAxis: [{ properties: { ...ejeCategorico[0].properties, innerPadding: num(10) } }],
+    },
   });
   v.costos = grafico(hid(p + "costos"), region(R.bl), "columnChart", {
     y: [[ER, "Costo de ventas % ventas"], [ER, "Gastos de ventas % ventas"], [ER, "Gastos de administración % ventas"]],
@@ -383,7 +459,7 @@ function paginaMargenes() {
 
 function paginaBalance() {
   const p = "balance";
-  const R = { header: [1, 1, 6, 2], nav: [6, 1, 10, 2], filters: [10, 1, 13, 2], kpis: [1, 2, 13, 4], tl: [1, 4, 5, 8], tm: [5, 4, 9, 8], tr: [9, 4, 13, 8], bl: [1, 8, 6, 13], br: [6, 8, 13, 13] };
+  const R = { header: [1, 1, 6, 2], nav: [6, 1, 10, 2], filters: [10, 1, 13, 2], kpis: [1, 2, 13, 4], tl: [1, 4, 5, 8], tm: [5, 4, 9, 8], tr: [9, 4, 13, 8], bl: [1, 8, 6, 13], br: [6, 8, 13, 12], conclusion: [6, 12, 13, 13] };
   const v = {};
   v.titulo = textoTitulo(hid(p + "titulo"), region(R.header), "Menos liquidez y más apalancamiento: el patrimonio cayó 62% desde 2020", 20);
   v.nav = navegador(hid(p + "nav"), region(R.nav));
@@ -416,6 +492,9 @@ function paginaBalance() {
     titulo: "Endeudamiento (veces el patrimonio)", subtitulo: "Pasivo total y deuda financiera sobre patrimonio total",
     alt: "Pasivo sobre patrimonio y deuda financiera sobre patrimonio por año; el pasivo sube de 2.17x (2020) a 6.68x (2025).",
     colores: { "Pasivo / Patrimonio": C.ambar, "Deuda financiera / Patrimonio": C.pizarra },
+    posEtiquetas: { "Pasivo / Patrimonio": "Above", "Deuda financiera / Patrimonio": "Under" },
+    // eje de 0 a 8x: espacio bajo el punto de 2020 (1.11x) y sobre el de 2025 (6.68x) para sus etiquetas
+    extraObjects: { valueAxis: [{ properties: { show: bool(true), start: num(0), end: num(8), fontSize: num(9), labelColor: color(C.tenue), gridlineShow: bool(true), gridlineColor: color(C.borde) } }] },
   });
   v.retornos = grafico(hid(p + "retornos"), region(R.bl), "clusteredColumnChart", {
     y: [[BAL, "ROE %"], [BAL, "ROA %"]],
@@ -428,10 +507,13 @@ function paginaBalance() {
     filas: ANIO,
     valores: [[BAL, "Margen neto controladora % (DuPont)", "Margen neto (controladora)"], [BAL, "Rotación de activos (DuPont)", "× Rotación de activos"], [BAL, "Apalancamiento (DuPont)", "× Apalancamiento"], [BAL, "ROE %", "= ROE"]],
     fuente: 14,
-    titulo: "Análisis DuPont: ¿de dónde viene el ROE?", subtitulo: "Margen neto controladora × Rotación de activos × Apalancamiento = ROE",
+    titulo: "Análisis DuPont: ¿de dónde viene el ROE?",
+    subtitulo: "Margen neto × Rotación × Apalancamiento = ROE. Apalancamiento = activo total / patrimonio de la controladora (saldos promedio), distinto de Pasivo / Patrimonio",
     alt: "Descomposición DuPont del ROE 2021-2025. En 2025 el ROE de 25.7% se explica por un apalancamiento de 6.59x, con margen neto de 3.8% y rotación de 1.03x.",
     filtros: [filtroDesde2021(p + "dupont2021")],
   });
+  v.conclusion = textoDestacado(hid(p + "conclusion"), region(R.conclusion),
+    "Entre 2022 y 2025 el margen y la rotación casi no cambiaron; el ROE subió por el apalancamiento (4.45x → 6.59x)");
   const interacciones = ["financiamiento", "liquidez", "endeudamiento", "retornos", "dupont"].map((k) => ({ source: v.anio.name, target: v[k].name, type: "NoFilter" }));
   return { nombre: hid("pagina-balance"), titulo: "Balance y ratios", visuales: Object.values(v), interacciones };
 }

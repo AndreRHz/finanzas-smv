@@ -1,12 +1,12 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "82f0cfb8704d0027d021",
   "position": {
     "x": 816,
     "y": 640,
-    "z": 38000,
-    "height": 408,
     "width": 1072,
+    "height": 320,
+    "z": 38000,
     "tabOrder": 38000
   },
   "visual": {
@@ -27,8 +27,7 @@
                 }
               },
               "queryRef": "Año.Año",
-              "nativeQueryRef": "Año",
-              "active": true
+              "nativeQueryRef": "Año"
             }
           ]
         },
@@ -149,6 +148,13 @@
                       "Value": "'#F8FAFC'"
                     }
                   }
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
                 }
               }
             }
@@ -446,7 +452,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Margen neto controladora × Rotación de activos × Apalancamiento = ROE'"
+                  "Value": "'Margen neto × Rotación × Apalancamiento = ROE. Apalancamiento = activo total / patrimonio de la controladora (saldos promedio), distinto de Pasivo / Patrimonio'"
                 }
               }
             },

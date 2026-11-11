@@ -1,37 +1,18 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
   "name": "cc63abe974c4dcf7ed89",
   "position": {
     "x": 976,
     "y": 208,
-    "z": 18000,
-    "height": 840,
     "width": 920,
+    "height": 840,
+    "z": 18000,
     "tabOrder": 18000
   },
   "visual": {
     "visualType": "pivotTable",
     "query": {
       "queryState": {
-        "Columns": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Año"
-                    }
-                  },
-                  "Property": "Año"
-                }
-              },
-              "queryRef": "Año.Año",
-              "nativeQueryRef": "Año",
-              "active": true
-            }
-          ]
-        },
         "Rows": {
           "projections": [
             {
@@ -46,8 +27,7 @@
                 }
               },
               "queryRef": "Cuenta Resultados.Cuenta",
-              "nativeQueryRef": "Cuenta",
-              "active": true
+              "nativeQueryRef": "Cuenta"
             }
           ]
         },
@@ -66,6 +46,24 @@
               },
               "queryRef": "Estado de Resultados.Monto",
               "nativeQueryRef": "Monto"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Año"
+                    }
+                  },
+                  "Property": "Año"
+                }
+              },
+              "queryRef": "Año.Año",
+              "nativeQueryRef": "Año"
             }
           ]
         }
@@ -124,6 +122,13 @@
                   }
                 }
               }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Right'"
+                }
+              }
             }
           }
         }
@@ -156,6 +161,108 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Estado de Resultados"
+                                    }
+                                  },
+                                  "Property": "Fila subtotal"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "1D"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#E2E8F0'"
+                            }
+                          }
+                        }
+                      ],
+                      "DefaultValue": {
+                        "Literal": {
+                          "Value": "'#FFFFFF'"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Estado de Resultados"
+                                    }
+                                  },
+                                  "Property": "Fila subtotal"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "1D"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#0F172A'"
+                            }
+                          }
+                        }
+                      ],
+                      "DefaultValue": {
+                        "Literal": {
+                          "Value": "'#334155'"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Cuenta Resultados.Cuenta"
           }
         }
       ],
@@ -213,6 +320,108 @@
                 }
               }
             }
+          }
+        },
+        {
+          "properties": {
+            "backColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Estado de Resultados"
+                                    }
+                                  },
+                                  "Property": "Fila subtotal"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "1D"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#E2E8F0'"
+                            }
+                          }
+                        }
+                      ],
+                      "DefaultValue": {
+                        "Literal": {
+                          "Value": "'#FFFFFF'"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "Estado de Resultados"
+                                    }
+                                  },
+                                  "Property": "Fila subtotal"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "1D"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#0F172A'"
+                            }
+                          }
+                        }
+                      ],
+                      "DefaultValue": {
+                        "Literal": {
+                          "Value": "'#334155'"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Estado de Resultados.Monto"
           }
         }
       ],
@@ -419,7 +628,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Última versión publicada de cada año'"
+                  "Value": "'Última versión publicada de cada año · en orden contable; filas resaltadas: subtotales (utilidad bruta, operativa, antes de impuestos, continuadas y neta)'"
                 }
               }
             },
@@ -450,7 +659,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Matriz del Estado de Resultados por cuenta y año, 2020-2025, en miles de soles.'"
+                  "Value": "'Matriz del Estado de Resultados por cuenta y año, 2020-2025, en miles de soles, en orden contable desde ventas hasta la utilidad neta y su atribución; los subtotales están resaltados.'"
                 }
               }
             }
