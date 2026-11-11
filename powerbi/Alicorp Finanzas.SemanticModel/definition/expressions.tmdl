@@ -1,0 +1,4 @@
+/// Carpeta local con los archivos pbi_*.parquet (debe terminar en \). Cámbiala si el repositorio está en otra ruta.
+expression CarpetaParquet = "E:\Proyectos\finanzas-smv\parquet\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b6d9b4e4-4668-4f62-b40b-771901d59dc9
+

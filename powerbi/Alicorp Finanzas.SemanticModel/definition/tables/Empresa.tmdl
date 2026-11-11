@@ -1,0 +1,52 @@
+/// Empresa emisora de los estados financieros. Una fila por empresa y tipo de EEFF (hoy: Alicorp, consolidado).
+table Empresa
+	lineageTag: d3ea1c0b-e503-4ca3-8516-9715ccf0bed6
+
+	/// Clave de la empresa.
+	column 'ID empresa'
+		dataType: int64
+		isHidden
+		isKey
+		lineageTag: c349be33-12ab-449b-aef3-8dbf77cf63fc
+		summarizeBy: none
+		sourceColumn: empresa_id
+
+	/// Razón social registrada en la SMV.
+	column 'Razón social'
+		dataType: string
+		lineageTag: d0bdb883-a498-46ed-929c-f922ddf1589a
+		sourceColumn: razon_social
+
+	/// Nombre corto de la empresa para títulos y segmentadores.
+	column Empresa
+		dataType: string
+		lineageTag: aeca94cc-6748-4919-90f8-c0e93b861091
+		sourceColumn: nombre_corto
+
+	/// Tipo de estados financieros (Consolidada / Individual).
+	column 'Tipo de EEFF'
+		dataType: string
+		lineageTag: 2b7af8da-ac54-4c07-b31a-76e1e6d816e8
+		sourceColumn: tipo_eeff
+
+	/// Moneda de presentación (código ISO).
+	column Moneda
+		dataType: string
+		lineageTag: 308019f3-7c94-4d5c-b2de-48831649f0b9
+		sourceColumn: moneda
+
+	/// Unidad de los montos (miles de S/).
+	column Unidad
+		dataType: string
+		lineageTag: 5c6f6e6d-5716-43c6-8560-36db75282ae0
+		sourceColumn: unidad
+
+	partition Empresa = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_dim_empresa.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"empresa_id", Int64.Type}, {"razon_social", type text}, {"nombre_corto", type text}, {"tipo_eeff", type text}, {"moneda", type text}, {"unidad", type text}})
+				in
+				    Tipos
+

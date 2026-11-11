@@ -1,0 +1,122 @@
+/// Estado de Resultados tal como lo presentó cada reporte anual: año actual y año anterior con la misma clasificación. Base para variaciones YoY comparables. Montos en miles de S/.
+table 'Resultados Comparativo'
+	lineageTag: 7ef2989a-fa45-4cfe-8c7e-afe30cecd627
+
+	/// Monto del año según su propio reporte anual (puede diferir de la versión vigente si un reporte posterior lo reexpresó). Miles de S/.
+	measure 'Monto año actual (comparable)' = SUM ( 'Resultados Comparativo'[Importe actual] )
+		formatString: #,##0
+		displayFolder: Base
+		lineageTag: 8658405c-f9c2-4afc-a700-c751784a6147
+
+	/// Monto del año anterior tal como lo presentó el reporte del año seleccionado (misma clasificación que el año actual). Miles de S/.
+	measure 'Monto año anterior (comparable)' = SUM ( 'Resultados Comparativo'[Importe anterior] )
+		formatString: #,##0
+		displayFolder: Base
+		lineageTag: 6ff7549a-54ce-40cc-aa05-cd63db403256
+
+	/// Variación absoluta vs. año anterior en miles de S/, con ambos años del mismo reporte (clasificación homogénea). Vacío para 2020.
+	measure 'Variación YoY' =
+			VAR _actual = [Monto año actual (comparable)]
+			VAR _anterior = [Monto año anterior (comparable)]
+			RETURN
+			    IF ( NOT ISBLANK ( _anterior ), _actual - _anterior )
+		formatString: #,##0
+		displayFolder: Variación YoY
+		lineageTag: 98692580-a7cb-4ae0-836d-168c9f4336b2
+
+	/// Variación % vs. año anterior con ambos años del mismo reporte. Divide entre el valor absoluto del año anterior para que el signo sea correcto si ese año fue pérdida. Vacío para 2020.
+	measure 'Variación YoY %' =
+			VAR _actual = [Monto año actual (comparable)]
+			VAR _anterior = [Monto año anterior (comparable)]
+			RETURN
+			    DIVIDE ( _actual - _anterior, ABS ( _anterior ) )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: a30651d4-b0f0-4c48-9b10-1d43a8e2f0e6
+
+	/// Ventas del año anterior tal como las presentó el reporte del año seleccionado (comparable con las ventas del año). Miles de S/.
+	measure 'Ventas año anterior' = CALCULATE ( [Monto año anterior (comparable)], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
+		formatString: #,##0
+		displayFolder: Variación YoY
+		lineageTag: 3c8838ea-cda1-4a6d-9bcf-4c164cb4bbbc
+
+	/// Crecimiento de ventas vs. año anterior, ambos años del mismo reporte (comparable).
+	measure 'Ventas YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: 147affb1-9620-4946-9465-83eca652c622
+
+	/// Variación de la utilidad bruta vs. año anterior (comparable, mismo reporte).
+	measure 'Utilidad bruta YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER03" )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: 4ce46c17-4483-4347-b3ac-f6b6dd396bc6
+
+	/// Variación de la utilidad operativa vs. año anterior (comparable, mismo reporte).
+	measure 'Utilidad operativa YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER09" )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: b11f8f84-6d5f-40dc-a8e4-fd4c5a1be021
+
+	/// Variación de la utilidad de operaciones continuadas vs. año anterior (comparable, mismo reporte).
+	measure 'Utilidad continuadas YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER23" )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: 359f6cff-07a4-4060-bef7-b129fdab851f
+
+	/// Variación de la utilidad neta vs. año anterior (comparable). Si el año anterior fue pérdida, se divide entre su valor absoluto.
+	measure 'Utilidad neta YoY %' = CALCULATE ( [Variación YoY %], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER25" )
+		formatString: 0.0%
+		displayFolder: Variación YoY
+		lineageTag: 7f9d36c8-c090-4280-9ab3-37d2009b5826
+
+	column 'ID empresa'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 8b9f6c04-580a-4b49-948e-f04152458379
+		summarizeBy: none
+		sourceColumn: empresa_id
+
+	column Año
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 99cc30ed-de1e-4b0d-91b4-99d236c0f5e4
+		summarizeBy: none
+		sourceColumn: anio
+
+	column 'ID cuenta'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 3dc4fa65-3542-4090-ae46-cd6507d06f92
+		sourceColumn: cuenta_id
+
+	/// Monto del año según su propio reporte.
+	column 'Importe actual'
+		dataType: decimal
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 6b62774d-f428-456b-8940-dd5dff2d427d
+		summarizeBy: none
+		sourceColumn: monto_actual
+
+	/// Monto del año anterior según el mismo reporte (misma clasificación).
+	column 'Importe anterior'
+		dataType: decimal
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 8aae37da-11fb-478b-b82f-6dc5f59eece0
+		summarizeBy: none
+		sourceColumn: monto_anterior
+
+	partition 'Resultados Comparativo' = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_fact_er_comparativo.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"empresa_id", Int64.Type}, {"anio", Int64.Type}, {"cuenta_id", type text}, {"monto_actual", Currency.Type}, {"monto_anterior", Currency.Type}})
+				in
+				    Tipos
+

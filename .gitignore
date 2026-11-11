@@ -2,3 +2,7 @@
 __pycache__/
 finanzas.duckdb
 finanzas.duckdb.wal
+
+# Power BI (PBIP): archivos locales de Desktop
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

@@ -1,0 +1,42 @@
+/// Años de las cifras (2020-2025). Grano: un año fiscal (cierre al 31 de diciembre).
+table Año
+	lineageTag: f8fa91ed-c080-4cdc-b234-af3163341596
+
+	/// Año fiscal de la cifra.
+	column Año
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 4a238f34-b743-47c7-a2ee-23c906ee0695
+		summarizeBy: none
+		sourceColumn: anio
+
+	/// Año del reporte SMV del que se toma la versión vigente (última publicada) de las cifras de ese año.
+	column 'Reporte fuente'
+		dataType: int64
+		formatString: 0
+		lineageTag: ac5a8f48-7484-41d8-8f7a-dea82618b117
+		summarizeBy: none
+		sourceColumn: anio_reporte_fuente
+
+	/// Falso para 2020: solo existe como comparativo del reporte 2021.
+	column 'Tiene reporte propio'
+		dataType: boolean
+		lineageTag: 5c5347da-c502-43a7-ab9b-2f9e0ea99c22
+		sourceColumn: tiene_reporte_propio
+
+	/// Verdadero para el año más reciente disponible.
+	column 'Es último año'
+		dataType: boolean
+		lineageTag: b8c8f72f-390f-4008-bfc5-23a23dc1749b
+		sourceColumn: es_ultimo_anio
+
+	partition Año = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_dim_anio.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"anio", Int64.Type}, {"anio_reporte_fuente", Int64.Type}, {"tiene_reporte_propio", type logical}, {"es_ultimo_anio", type logical}})
+				in
+				    Tipos
+

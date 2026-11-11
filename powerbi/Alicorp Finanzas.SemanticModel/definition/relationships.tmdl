@@ -1,0 +1,36 @@
+relationship ER_Empresa
+	fromColumn: 'Estado de Resultados'.'ID empresa'
+	toColumn: Empresa.'ID empresa'
+
+relationship ER_Anio
+	fromColumn: 'Estado de Resultados'.Año
+	toColumn: Año.Año
+
+relationship ER_Cuenta
+	fromColumn: 'Estado de Resultados'.'ID cuenta'
+	toColumn: 'Cuenta Resultados'.'ID cuenta'
+
+relationship Comp_Empresa
+	fromColumn: 'Resultados Comparativo'.'ID empresa'
+	toColumn: Empresa.'ID empresa'
+
+relationship Comp_Anio
+	fromColumn: 'Resultados Comparativo'.Año
+	toColumn: Año.Año
+
+relationship Comp_Cuenta
+	fromColumn: 'Resultados Comparativo'.'ID cuenta'
+	toColumn: 'Cuenta Resultados'.'ID cuenta'
+
+relationship Bal_Empresa
+	fromColumn: Balance.'ID empresa'
+	toColumn: Empresa.'ID empresa'
+
+relationship Bal_Anio
+	fromColumn: Balance.Año
+	toColumn: Año.Año
+
+relationship Bal_Cuenta
+	fromColumn: Balance.'ID cuenta'
+	toColumn: 'Cuenta Balance'.'ID cuenta'
+

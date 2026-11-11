@@ -1,0 +1,95 @@
+/// Plan de cuentas del Estado de Resultados SMV (43 cuentas) con agrupaciones para análisis y cascada.
+table 'Cuenta Resultados'
+	lineageTag: 5ad6b0bd-385d-42f4-95c4-33166baba37a
+
+	/// Clave de la cuenta (ER01-ER43).
+	column 'ID cuenta'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: a6b04681-3c95-46ad-9bb8-47f770fa19a2
+		sourceColumn: cuenta_id
+
+	/// Posición de la cuenta en el Estado de Resultados SMV.
+	column Orden
+		dataType: int64
+		isHidden
+		lineageTag: b8c5bbee-4a2e-4a82-974a-49ed5be08489
+		summarizeBy: none
+		sourceColumn: orden
+
+	/// Nombre oficial de la cuenta en la plantilla SMV.
+	column 'Cuenta SMV'
+		dataType: string
+		lineageTag: 0c6ccc7c-3b5b-4c74-abcc-0ac40703afe6
+		sourceColumn: cuenta
+		sortByColumn: Orden
+
+	/// Nombre corto de la cuenta para visualizaciones.
+	column Cuenta
+		dataType: string
+		lineageTag: 266caec6-2b4d-4d87-b10d-3f814130a4e7
+		sourceColumn: cuenta_corta
+		sortByColumn: Orden
+
+	/// Agrupación analítica (Ingresos, Gastos operativos, Resultado financiero, UPA, etc.).
+	column Grupo
+		dataType: string
+		lineageTag: 79fbb0f2-20c7-4f94-8b4f-d14ab43692dd
+		sourceColumn: grupo
+
+	/// detalle = línea sumable; subtotal = resultado de sumar el detalle anterior; titulo = encabezado sin monto; memo = informativa (atribución, UPA).
+	column 'Tipo de fila'
+		dataType: string
+		lineageTag: aacb1e29-367e-45c5-8fa8-4dcba78d9d19
+		sourceColumn: tipo_fila
+
+	/// Verdadero en subtotales (utilidad bruta, operativa, antes de impuestos, continuadas, neta). No sumar junto con el detalle.
+	column 'Es subtotal'
+		dataType: boolean
+		lineageTag: 403f625f-994b-40c5-bc0e-f055c45a8e50
+		sourceColumn: es_subtotal
+
+	/// Naturaleza de la cuenta: +1 ingreso/ganancia, -1 gasto. Los montos ya vienen con signo contable.
+	column Signo
+		dataType: int64
+		lineageTag: 9b97193d-a7ad-4655-85b8-b0ada830bfcd
+		summarizeBy: none
+		sourceColumn: signo
+
+	/// Paso del gráfico de cascada (13 pasos de Ventas a Utilidad neta). Vacío para títulos, atribución y UPA.
+	column 'Paso cascada'
+		dataType: string
+		lineageTag: b7c0baa8-1c0d-4314-94bb-994a9ecfa0eb
+		sourceColumn: grupo_cascada
+		sortByColumn: 'Orden cascada'
+
+	/// Orden del paso de cascada.
+	column 'Orden cascada'
+		dataType: int64
+		isHidden
+		lineageTag: 11c41eea-c5e8-4ea9-b328-ebdb8be445cc
+		summarizeBy: none
+		sourceColumn: orden_cascada
+
+	/// Miles de S/ o S/ por acción (UPA).
+	column Unidad
+		dataType: string
+		lineageTag: daba9fe6-7490-4c83-81fa-7c023888beab
+		sourceColumn: unidad
+
+	/// Falso para títulos y cuentas en cero todos los años; usar como filtro en tablas del estado.
+	column Mostrar
+		dataType: boolean
+		lineageTag: 3e9f60b4-cce4-47d3-a00b-00262a698ce3
+		sourceColumn: mostrar
+
+	partition 'Cuenta Resultados' = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_dim_cuenta_er.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"cuenta_id", type text}, {"orden", Int64.Type}, {"cuenta", type text}, {"cuenta_corta", type text}, {"grupo", type text}, {"tipo_fila", type text}, {"es_subtotal", type logical}, {"signo", Int64.Type}, {"grupo_cascada", type text}, {"orden_cascada", Int64.Type}, {"unidad", type text}, {"mostrar", type logical}})
+				in
+				    Tipos
+

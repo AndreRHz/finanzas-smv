@@ -1,0 +1,195 @@
+/// Hechos del Estado de Situación Financiera: una fila por empresa, año y cuenta (saldos al cierre). Montos en miles de S/. Sin reexpresiones en el periodo.
+table Balance
+	lineageTag: 6afb61ca-516d-49aa-930d-fdb1a0201077
+
+	/// Saldo al cierre del último año del contexto (los saldos no se suman entre años), miles de S/.
+	measure Saldo =
+			VAR _anio = MAX ( 'Año'[Año] )
+			RETURN
+			    CALCULATE ( SUM ( 'Balance'[Importe] ), 'Año'[Año] = _anio )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 97ac172b-8c27-4a84-a497-8bf1e45ebe26
+
+	/// Total activos corrientes al cierre, miles de S/.
+	measure 'Activo corriente' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "ACT_CORR" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: f970e7a4-e7ef-4d21-81d0-8aa473062052
+
+	/// Total activos al cierre, miles de S/.
+	measure 'Activo total' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "ACT_TOTAL" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 440c7df4-de8d-4eb8-9fbf-f0075b673b5f
+
+	/// Total pasivos corrientes al cierre, miles de S/.
+	measure 'Pasivo corriente' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "PAS_CORR" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 6d2110bf-c312-453f-b27b-fba8fd12067c
+
+	/// Total pasivos al cierre, miles de S/.
+	measure 'Pasivo total' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "PAS_TOTAL" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 75a4097d-162e-44f0-9880-5f4610a1055c
+
+	/// Total patrimonio al cierre (incluye participaciones no controladoras), miles de S/.
+	measure 'Patrimonio total' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "PAT_TOTAL" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 2e461158-8d86-44a8-8847-350da1e5cde5
+
+	/// Patrimonio atribuible a los propietarios de la controladora al cierre, miles de S/. Denominador del ROE.
+	measure 'Patrimonio controladora' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "PAT_CONTROLADORA" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: 79331c1a-430d-47c6-b482-8fbb4e760526
+
+	/// Efectivo y equivalentes al efectivo al cierre, miles de S/.
+	measure Efectivo = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "EFECTIVO" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: f71d2aef-61bd-4879-b92b-319577230a37
+
+	/// Inventarios corrientes al cierre, miles de S/.
+	measure Inventarios = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] = "INVENTARIOS" )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: dc9b8d94-b64a-482e-b09a-e114aa7f0783
+
+	/// Otros pasivos financieros corrientes + no corrientes al cierre (préstamos, bonos, arrendamientos y derivados según la plantilla SMV), miles de S/.
+	measure 'Deuda financiera' = CALCULATE ( [Saldo], REMOVEFILTERS ( 'Cuenta Balance' ), 'Cuenta Balance'[Clave ratio] IN { "DEUDA_FIN_CORR", "DEUDA_FIN_NO_CORR" } )
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: a74ced53-e1f8-4287-9900-046a51487461
+
+	/// Deuda financiera menos efectivo y equivalentes al cierre, miles de S/.
+	measure 'Deuda financiera neta' = [Deuda financiera] - [Efectivo]
+		formatString: #,##0
+		displayFolder: Saldos
+		lineageTag: af11b781-6c4a-4b39-8342-77ffd515f1ef
+
+	/// Activo corriente / Pasivo corriente al cierre.
+	measure 'Liquidez corriente' = DIVIDE ( [Activo corriente], [Pasivo corriente] )
+		formatString: 0.00"x"
+		displayFolder: Liquidez
+		lineageTag: b5349fb7-25ff-49bd-8283-22302808c3bd
+
+	/// (Activo corriente - Inventarios) / Pasivo corriente al cierre.
+	measure 'Prueba ácida' = DIVIDE ( [Activo corriente] - [Inventarios], [Pasivo corriente] )
+		formatString: 0.00"x"
+		displayFolder: Liquidez
+		lineageTag: 42540b3f-0bb3-4a83-aaff-8fef557c1d15
+
+	/// Efectivo y equivalentes / Pasivo corriente al cierre.
+	measure 'Razón de efectivo' = DIVIDE ( [Efectivo], [Pasivo corriente] )
+		formatString: 0.00"x"
+		displayFolder: Liquidez
+		lineageTag: 3e34af2e-4012-4c7a-903f-fe3d7d08d360
+
+	/// Pasivo total / Patrimonio total al cierre (veces).
+	measure 'Pasivo / Patrimonio' = DIVIDE ( [Pasivo total], [Patrimonio total] )
+		formatString: 0.00"x"
+		displayFolder: Endeudamiento
+		lineageTag: 8ae4ddf4-d612-4a74-9670-7f9216064d67
+
+	/// Proporción del activo financiada con pasivos, al cierre.
+	measure 'Pasivo / Activo %' = DIVIDE ( [Pasivo total], [Activo total] )
+		formatString: 0.0%
+		displayFolder: Endeudamiento
+		lineageTag: 0c7efbc6-f0e4-401f-8bb3-5f99082c5d45
+
+	/// Deuda financiera (otros pasivos financieros) / Patrimonio total al cierre (veces).
+	measure 'Deuda financiera / Patrimonio' = DIVIDE ( [Deuda financiera], [Patrimonio total] )
+		formatString: 0.00"x"
+		displayFolder: Endeudamiento
+		lineageTag: 84edaa56-46fc-44d5-93e5-8f4b17ddd91d
+
+	/// Activo total / Patrimonio total al cierre (apalancamiento, factor DuPont).
+	measure 'Multiplicador de capital' = DIVIDE ( [Activo total], [Patrimonio total] )
+		formatString: 0.00"x"
+		displayFolder: Endeudamiento
+		lineageTag: c843653c-1e27-4ad4-9d75-3335e9ce1241
+
+	/// Retorno sobre patrimonio = Utilidad neta controladora del año / Patrimonio controladora promedio (cierre del año anterior y del año). Vacío para 2020 (no hay saldo 2019).
+	measure 'ROE %' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _utilidad = CALCULATE ( [Utilidad neta controladora], 'Año'[Año] = _anio )
+			VAR _patrimonioFinal = CALCULATE ( [Patrimonio controladora], 'Año'[Año] = _anio )
+			VAR _patrimonioInicial = CALCULATE ( [Patrimonio controladora], 'Año'[Año] = _anio - 1 )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _patrimonioInicial ) && NOT ISBLANK ( _patrimonioFinal ),
+			        DIVIDE ( _utilidad, ( _patrimonioInicial + _patrimonioFinal ) / 2 )
+			    )
+		formatString: 0.0%
+		displayFolder: Rentabilidad
+		lineageTag: f8b10fc0-0546-45c2-9a95-fe3494518174
+
+	/// Retorno sobre activos = Utilidad neta del año / Activo total promedio (cierre del año anterior y del año). Vacío para 2020.
+	measure 'ROA %' =
+			VAR _anio = MAX ( 'Año'[Año] )
+			VAR _utilidad = CALCULATE ( [Utilidad neta], 'Año'[Año] = _anio )
+			VAR _activoFinal = CALCULATE ( [Activo total], 'Año'[Año] = _anio )
+			VAR _activoInicial = CALCULATE ( [Activo total], 'Año'[Año] = _anio - 1 )
+			RETURN
+			    IF (
+			        NOT ISBLANK ( _activoInicial ) && NOT ISBLANK ( _activoFinal ),
+			        DIVIDE ( _utilidad, ( _activoInicial + _activoFinal ) / 2 )
+			    )
+		formatString: 0.0%
+		displayFolder: Rentabilidad
+		lineageTag: e3890c02-3efd-4050-a961-7aa690636f8d
+
+	column 'ID empresa'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 05637127-fc32-4c47-91f0-69e44691d2c5
+		summarizeBy: none
+		sourceColumn: empresa_id
+
+	column Año
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: c9af52c7-9b7a-4ff2-97a4-5111bf4ede7b
+		summarizeBy: none
+		sourceColumn: anio
+
+	column 'ID cuenta'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 35d0f755-ab7b-40ba-80e1-2a49c9901235
+		sourceColumn: cuenta_id
+
+	/// Saldo al cierre con signo contable.
+	column Importe
+		dataType: decimal
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: e4e0bde3-3dab-42fc-8fc1-f2e0bf9231d6
+		summarizeBy: none
+		sourceColumn: monto
+
+	/// Año del reporte SMV del que proviene el saldo vigente.
+	column 'Reporte fuente'
+		dataType: int64
+		formatString: 0
+		lineageTag: d3c81257-2a41-4807-8d9b-5bebf62534ac
+		summarizeBy: none
+		sourceColumn: anio_reporte_fuente
+
+	partition Balance = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_fact_bal.parquet")),
+				    Columnas = Table.SelectColumns(Origen, {"empresa_id", "anio", "cuenta_id", "monto", "anio_reporte_fuente"}),
+				    Tipos = Table.TransformColumnTypes(Columnas, {{"empresa_id", Int64.Type}, {"anio", Int64.Type}, {"cuenta_id", type text}, {"monto", Currency.Type}, {"anio_reporte_fuente", Int64.Type}})
+				in
+				    Tipos
+

@@ -1,0 +1,86 @@
+/// Plan de cuentas del Estado de Situación Financiera SMV (78 cuentas) con secciones, grupos y claves para ratios.
+table 'Cuenta Balance'
+	lineageTag: c3d15d9b-ba00-48dd-b91e-75a0b38c258b
+
+	/// Clave de la cuenta (BG01-BG78).
+	column 'ID cuenta'
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: c33d6dfa-d848-4b74-85fc-3ca951f42ac5
+		sourceColumn: cuenta_id
+
+	/// Posición de la cuenta en el balance SMV.
+	column Orden
+		dataType: int64
+		isHidden
+		lineageTag: 41cd378c-fb9c-4a2e-ada3-7b7bcbc51cd1
+		summarizeBy: none
+		sourceColumn: orden
+
+	/// Nombre oficial de la cuenta en la plantilla SMV.
+	column 'Cuenta SMV'
+		dataType: string
+		lineageTag: dd30ecd8-6eb1-4fc2-ae07-2cedfb76ef6f
+		sourceColumn: cuenta
+		sortByColumn: Orden
+
+	/// Nombre corto; (NC) = no corriente.
+	column Cuenta
+		dataType: string
+		lineageTag: a659bce2-d3fa-4766-8292-cb08efec583c
+		sourceColumn: cuenta_corta
+		sortByColumn: Orden
+
+	/// Activo, Pasivo, Patrimonio o Pasivo y patrimonio.
+	column Sección
+		dataType: string
+		lineageTag: f54c7e23-d883-4ada-b10f-626eaca2c007
+		sourceColumn: seccion
+
+	/// Activo corriente, Activo no corriente, Pasivo corriente, Pasivo no corriente, Patrimonio y totales.
+	column Grupo
+		dataType: string
+		lineageTag: b52cbd59-1df7-43cf-a926-51967738a6d5
+		sourceColumn: grupo
+
+	/// detalle = línea sumable; subtotal = total o subtotal; titulo = encabezado sin monto.
+	column 'Tipo de fila'
+		dataType: string
+		lineageTag: 0f15e0be-b65b-42c9-aabe-f340fc89a0b9
+		sourceColumn: tipo_fila
+
+	/// Verdadero en totales y subtotales. No sumar junto con el detalle.
+	column 'Es subtotal'
+		dataType: boolean
+		lineageTag: 38f97f17-d760-4174-b03b-1e521a7fdd76
+		sourceColumn: es_subtotal
+
+	/// -1 solo para acciones propias en cartera (resta del patrimonio).
+	column Signo
+		dataType: int64
+		lineageTag: 68c76c70-ae72-46dd-b7fc-02c3656c3009
+		summarizeBy: none
+		sourceColumn: signo
+
+	/// Clave usada por las medidas de ratios (ACT_CORR, PAS_CORR, PAT_TOTAL, etc.).
+	column 'Clave ratio'
+		dataType: string
+		lineageTag: 6d3885d1-98bf-4420-85ca-8428ebee5420
+		sourceColumn: clave_ratio
+
+	/// Falso para títulos y cuentas en cero todos los años.
+	column Mostrar
+		dataType: boolean
+		lineageTag: 0d2b4043-3eaf-4a94-acc9-40c46a18897d
+		sourceColumn: mostrar
+
+	partition 'Cuenta Balance' = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_dim_cuenta_bal.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"cuenta_id", type text}, {"orden", Int64.Type}, {"cuenta", type text}, {"cuenta_corta", type text}, {"seccion", type text}, {"grupo", type text}, {"tipo_fila", type text}, {"es_subtotal", type logical}, {"signo", Int64.Type}, {"clave_ratio", type text}, {"mostrar", type logical}})
+				in
+				    Tipos
+

@@ -1,0 +1,158 @@
+/// Hechos del Estado de Resultados: una fila por empresa, año y cuenta, con la versión vigente (última publicada). Montos en miles de S/ (UPA en S/).
+table 'Estado de Resultados'
+	lineageTag: 2442decf-94fc-40d8-b689-058b2dad1b1f
+
+	/// Suma del monto vigente (última versión publicada), en miles de S/, con signo contable (gastos negativos). Para matrices y cascada por cuenta: no sumar subtotales junto con su detalle (filtrar 'Cuenta Resultados'[Tipo de fila]).
+	measure Monto = SUM ( 'Estado de Resultados'[Importe] )
+		formatString: #,##0
+		displayFolder: Base
+		lineageTag: 4603d8dd-4750-45f9-ac77-90ac317a475e
+
+	/// Monto tal como se publicó por primera vez (antes de reexpresiones), en miles de S/. Comparar con [Monto] para ver el efecto de las reexpresiones.
+	measure 'Monto original' = SUM ( 'Estado de Resultados'[Importe original] )
+		formatString: #,##0
+		displayFolder: Base
+		lineageTag: 7038b086-ff90-4290-828a-39d21c902224
+
+	/// Ingresos de actividades ordinarias (operaciones continuadas), miles de S/, versión vigente.
+	measure Ventas = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER01" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: 5b1c0aa7-5d3d-4cfe-86e7-2bbc127d66ac
+
+	/// Costo de ventas en miles de S/ (negativo, signo contable), versión vigente.
+	measure 'Costo de ventas' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER02" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: e938c594-891a-4b3f-907f-086b98ab1421
+
+	/// Ganancia bruta = Ventas + Costo de ventas, miles de S/, versión vigente.
+	measure 'Utilidad bruta' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER03" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: 5149c4c8-2f9c-462e-a3a6-610bc655c5c1
+
+	/// Ganancia operativa (después de gastos de ventas, administración y otros operativos), miles de S/, versión vigente.
+	measure 'Utilidad operativa' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER09" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: b5252064-1f04-4c26-a203-a96e026dbaea
+
+	/// Ganancia antes de impuesto a la renta (operaciones continuadas), miles de S/, versión vigente.
+	measure 'Utilidad antes de impuestos' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER21" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: 0f4a7b42-cc39-4dcb-af37-ca370c82e567
+
+	/// Ganancia neta del ejercicio = continuadas + discontinuadas, incluye participaciones no controladoras. Miles de S/, versión vigente.
+	measure 'Utilidad neta' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER25" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: 7a2035a5-8b84-4d52-9473-a22715492787
+
+	/// Ganancia neta atribuible a los propietarios de la controladora, miles de S/. Numerador del ROE.
+	measure 'Utilidad neta controladora' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER27" )
+		formatString: #,##0
+		displayFolder: Resultados
+		lineageTag: 1c5c8b4d-29ad-40a5-996a-6543116c190f
+
+	/// Ganancia neta de operaciones continuadas (después de impuestos), miles de S/, versión vigente.
+	measure 'Utilidad operaciones continuadas' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER23" )
+		formatString: #,##0
+		displayFolder: Continuadas vs discontinuadas
+		lineageTag: 93a83119-7cbb-45d1-9163-90b0055f8831
+
+	/// Ganancia (pérdida) de operaciones discontinuadas, neta de impuesto, miles de S/, versión vigente. Utilidad neta = continuadas + discontinuadas.
+	measure 'Resultado operaciones discontinuadas' = CALCULATE ( [Monto], REMOVEFILTERS ( 'Cuenta Resultados' ), 'Cuenta Resultados'[ID cuenta] = "ER24" )
+		formatString: #,##0
+		displayFolder: Continuadas vs discontinuadas
+		lineageTag: 1b1c7f47-526e-418c-854e-67f7a16261cd
+
+	/// Utilidad bruta / Ventas (versión vigente).
+	measure 'Margen bruto %' = DIVIDE ( [Utilidad bruta], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 73de3daa-da06-42c2-8347-56568548c545
+
+	/// Utilidad operativa / Ventas (versión vigente).
+	measure 'Margen operativo %' = DIVIDE ( [Utilidad operativa], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 9a35d517-dc3b-42e1-9acf-b69588705310
+
+	/// Utilidad de operaciones continuadas / Ventas. Margen neto homogéneo: numerador y denominador corresponden al mismo perímetro de negocios.
+	measure 'Margen continuadas %' = DIVIDE ( [Utilidad operaciones continuadas], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 3ba77500-9770-4e9c-b972-ac1b525b7014
+
+	/// Utilidad neta (incluye discontinuadas) / Ventas (solo continuadas). Puede distorsionarse en años con discontinuadas relevantes; ver [Margen continuadas %].
+	measure 'Margen neto %' = DIVIDE ( [Utilidad neta], [Ventas] )
+		formatString: 0.0%
+		displayFolder: Márgenes
+		lineageTag: 00af3d0f-75b4-4187-b0a5-fa09c3f10ea9
+
+	column 'ID empresa'
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: f0afb924-b1b1-4bd4-8c55-d9e2d4bf5845
+		summarizeBy: none
+		sourceColumn: empresa_id
+
+	column Año
+		dataType: int64
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 027cf4f9-ef96-486e-867e-bc8b2588af8d
+		summarizeBy: none
+		sourceColumn: anio
+
+	column 'ID cuenta'
+		dataType: string
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 6a22245a-b4ed-4355-b6ba-1ff82311c4c2
+		sourceColumn: cuenta_id
+
+	/// Monto vigente con signo contable.
+	column Importe
+		dataType: decimal
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 24084c8e-1647-4995-8fd2-8166b0df585c
+		summarizeBy: none
+		sourceColumn: monto
+
+	/// Monto tal como se publicó por primera vez.
+	column 'Importe original'
+		dataType: decimal
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 8e77a6da-2af0-4842-848b-35168976910f
+		summarizeBy: none
+		sourceColumn: monto_original
+
+	/// Verdadero si la cifra vigente difiere de la publicada originalmente.
+	column 'Es reexpresado'
+		dataType: boolean
+		lineageTag: b1a876c8-737f-4985-ba26-d1fa8a143bd3
+		sourceColumn: es_reexpresado
+
+	/// Año del reporte SMV del que proviene la cifra vigente.
+	column 'Reporte fuente'
+		dataType: int64
+		formatString: 0
+		lineageTag: 01a214ba-a680-49a5-8a85-3437990112dc
+		summarizeBy: none
+		sourceColumn: anio_reporte_fuente
+
+	partition 'Estado de Resultados' = m
+		mode: import
+		source =
+				let
+				    Origen = Parquet.Document(File.Contents(CarpetaParquet & "pbi_fact_er.parquet")),
+				    Tipos = Table.TransformColumnTypes(Origen, {{"empresa_id", Int64.Type}, {"anio", Int64.Type}, {"cuenta_id", type text}, {"monto", Currency.Type}, {"monto_original", Currency.Type}, {"es_reexpresado", type logical}, {"anio_reporte_fuente", Int64.Type}})
+				in
+				    Tipos
+

@@ -8,8 +8,8 @@ Por **etapas**. Al cerrar cada una: mostrar resultados de validación, **detener
 
 ## Etapas
 1. **ETL** – `etl_smv.py` carga `raw/*.xlsx` en `finanzas.duckdb` → `fact_eeff` (formato largo) + validaciones. ✅ **aprobada** (2026-11-11)
-2. **Modelo analítico (DuckDB)** – `modelo_smv.py` + `mapeos/*.csv`: dimensiones de cuentas ER y Balance, empresa, año, versión vigente y vistas `pbi_*`. Mapeo aprobado por el usuario. ✅ implementada, **en revisión del usuario**
-3. **Modelo semántico Power BI** – medidas DAX: Ventas, Utilidad bruta/operativa/neta, márgenes %, variación YoY, utilidad operaciones continuadas vs. discontinuadas, liquidez, endeudamiento, ROE.
+2. **Modelo analítico (DuckDB)** – `modelo_smv.py` + `mapeos/*.csv`: dimensiones de cuentas ER y Balance, empresa, año, versión vigente y vistas `pbi_*`. ✅ **aprobada**
+3. **Modelo semántico Power BI** – `exportar_parquet.py` + PBIP en `powerbi/`: 7 tablas, 9 relaciones, 45 medidas DAX. ✅ implementada, **en revisión del usuario**
 4. **Reporte** – páginas: (1) Resumen ejecutivo KPIs, (2) Estado de Resultados en cascada, (3) Márgenes y tendencias, (4) Balance y ratios. *Planificar el diseño antes de implementarlo.*
 
 ## Entorno
@@ -18,7 +18,12 @@ Por **etapas**. Al cerrar cada una: mostrar resultados de validación, **detener
 - `requirements.txt`: `duckdb==1.5.6` (fijado igual que el **CLI de DuckDB v1.5.6** instalado, para compatibilidad del archivo `.duckdb`), `openpyxl==3.1.5`.
 - Ejecutar ETL: `.venv\Scripts\python.exe etl_smv.py` (idempotente; recrea `fact_eeff`; exit code ≠ 0 si falla una validación).
 - Ejecutar modelo: `.venv\Scripts\python.exe modelo_smv.py` (**siempre después del ETL**: `dim_anio` y el flag `mostrar` se calculan a partir de los datos).
-- `finanzas.duckdb` y `.venv/` están en `.gitignore` (la BD es regenerable).
+- Exportar a Parquet: `.venv\Scripts\python.exe exportar_parquet.py` (después del modelo) → `parquet/pbi_*.parquet`. **Los `.parquet` se versionan en el repo** (decisión del usuario; no ignorarlos).
+- Orden completo: `etl_smv.py` → `modelo_smv.py` → `exportar_parquet.py` → actualizar en Power BI Desktop.
+- `finanzas.duckdb` y `.venv/` están en `.gitignore` (la BD es regenerable). También `**/.pbi/localSettings.json` y `**/.pbi/cache.abf`.
+- DuckDB bloquea el archivo: cerrar DBeaver (u otro cliente) antes de correr los scripts.
+- Power BI Desktop instalado (Microsoft Store, v2.159). CLI `powerbi-report-author` (npm global, v0.5.0) para scaffold/validación de reportes PBIR.
+- Los commits los hace el usuario.
 
 ## Fuente: estructura del Excel SMV (`raw/ReporteDetalleInformacionFinanciero - AAAA.xlsx`)
 - Una hoja; filas 1–6 metadatos (`Año: 2021`, `Periodo: Anual`, `Empresa: ALICORP S.A.A.`, `Tipo: Consolidada`).
@@ -69,5 +74,19 @@ Mapeos editables en `mapeos/` (`dim_cuenta_er.csv`, `dim_cuenta_bal.csv`, `dim_e
 ### ⚠️ Comparabilidad YoY (para la Etapa 3)
 Con la versión vigente, el año Y viene del reporte Y+1 y el año Y−1 del reporte Y: **pueden tener clasificaciones distintas**. Caso crítico: Ventas 2023 vigente (11,039,113, reexpresado en 2024 por operaciones discontinuadas) vs. 2022 vigente (15,392,402) → −28.3 %, cuando en clasificación homogénea (reporte 2023) es −11.3 %. Para variaciones YoY usar `pbi_fact_er_comparativo`. 2021 vs. 2020 tiene el mismo problema en menor grado. El balance no tiene reexpresiones (sin impacto).
 
+## Modelo semántico Power BI (Etapa 3)
+Proyecto PBIP: `powerbi/Alicorp Finanzas.pbip` → `Alicorp Finanzas.SemanticModel/` (TMDL) + `Alicorp Finanzas.Report/` (en blanco, 1 página "Resumen"; se diseña en la Etapa 4). Construido con el MCP `powerbi-modeling-mcp`; edición posterior: abrir el PBIP en Desktop, conectar el MCP a la instancia local y guardar desde Desktop (o exportar TMDL).
+
+- **Parámetro Power Query `CarpetaParquet`** (por defecto `E:\Proyectos\finanzas-smv\parquet\`, debe terminar en `\`). Todas las tablas: `Parquet.Document(File.Contents(CarpetaParquet & "<archivo>.parquet"))` + tipos explícitos.
+- Modo Import, cultura `es-PE`, `discourageImplicitMeasures` = true.
+- Tablas: `Empresa`, `Año`, `Cuenta Resultados`, `Cuenta Balance` (dimensiones); `Estado de Resultados` (vigente), `Resultados Comparativo` (YoY), `Balance` (hechos). Relaciones 1:* de una dirección desde las 3 dimensiones a cada hecho. Columnas de montos ocultas (`Importe…`); claves ocultas; `Cuenta` ordenada por `Orden`, `Paso cascada` por `Orden cascada`.
+- Medidas (miles de S/, con descripción y carpeta):
+  - *Estado de Resultados*: `Monto`, `Monto original`; Resultados (`Ventas`, `Costo de ventas`, `Utilidad bruta`, `Utilidad operativa`, `Utilidad antes de impuestos`, `Utilidad neta`, `Utilidad neta controladora`); Continuadas vs discontinuadas; Márgenes (`Margen bruto %`, `Margen operativo %`, `Margen continuadas %`, `Margen neto %`). KPIs por `CALCULATE([Monto], REMOVEFILTERS('Cuenta Resultados'), [ID cuenta] = "ERxx")`.
+  - *Resultados Comparativo*: `Monto año actual/anterior (comparable)`, `Variación YoY`, `Variación YoY %` (÷ ABS del año anterior), `Ventas año anterior`, `Ventas / Utilidad bruta / Utilidad operativa / Utilidad continuadas / Utilidad neta YoY %`. 2020 en blanco.
+  - *Balance*: `Saldo` (toma el último año del contexto; los saldos no se suman entre años), saldos por `Clave ratio`, `Deuda financiera (neta)`; Liquidez (`Liquidez corriente`, `Prueba ácida`, `Razón de efectivo`); Endeudamiento (`Pasivo / Patrimonio`, `Pasivo / Activo %`, `Deuda financiera / Patrimonio`, `Multiplicador de capital`); Rentabilidad (`ROE %` = U. neta controladora / patrimonio controladora promedio, `ROA %` = U. neta / activo total promedio; 2020 en blanco).
+- **Validación (OK)**: refresh completo en Desktop; filas por tabla = Parquet; `INFO.MEASURES()` sin errores; 40 medidas × 6 años (240 valores) idénticos a un cálculo SQL independiente sobre `fact_eeff`.
+- Nota: `Utilidad neta YoY %` 2022 = +1,978.5 % (2021 fue pérdida de −28,400): correcto matemáticamente, conviene no destacarlo en el reporte.
+- Limitación para la Etapa 4: `Grupo`/`Sección` de las dimensiones de cuentas se ordenan alfabéticamente (no hay columna de orden de grupo); agregarla si una matriz los necesita en orden contable.
+
 ## Estado actual
-Etapas 1 y 2 implementadas y validadas. **Esperando aprobación del usuario para iniciar la Etapa 3.**
+Etapas 1–3 implementadas y validadas. **Esperando aprobación del usuario para iniciar la Etapa 4** (planificar el diseño antes de implementar).

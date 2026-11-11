@@ -1,0 +1,20 @@
+/// Estados financieros consolidados anuales de Alicorp S.A.A. publicados por la SMV (2020-2025). Montos en miles de S/ (ganancia por acción en S/). Fuente: archivos Parquet generados desde finanzas.duckdb.
+model 'Alicorp Finanzas'
+	culture: es-PE
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_ProTooling = ["MCP-PBIModeling"]
+
+ref table Empresa
+ref table Año
+ref table 'Cuenta Resultados'
+ref table 'Cuenta Balance'
+ref table 'Estado de Resultados'
+ref table 'Resultados Comparativo'
+ref table Balance
+
